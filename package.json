@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "clean": "next clean",
-    "type-check": "bun x tsc --noEmit"
+    "type-check": "bun x tsc --noEmit",
+    "db:seed": "bun lib/seed.ts"
   },
   "dependencies": {
     "@elysiajs/eden": "^1.4.8",
