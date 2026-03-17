@@ -5,9 +5,11 @@ import {
   ComposableMap,
   Geographies,
   Geography,
-  ZoomableGroup
+  ZoomableGroup,
+  Marker
 } from 'react-simple-maps';
 import { motion, AnimatePresence } from 'motion/react';
+import { eden } from '@/lib/eden';
 
 // Reliable GeoJSON source for Nepal (Districts and States)
 const NEPAL_GEO_URL = 'https://raw.githubusercontent.com/mesaugat/geoJSON-Nepal/master/nepal-districts.geojson';
@@ -117,6 +119,7 @@ export default function NepalInteractiveMap() {
   const [hoveredDistrict, setHoveredDistrict] = useState<DistrictInfo | null>(null);
   const [mounted, setMounted] = useState(false);
   const [geoData, setGeoData] = useState<any>(null);
+  const [dbRegions, setDbRegions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [fetchingDetails, setFetchingDetails] = useState(false);
@@ -223,6 +226,19 @@ export default function NepalInteractiveMap() {
         }
         console.log(`Successfully loaded map data from source ${index + 1}: ${urls[index]}`);
         setGeoData(data);
+        
+        // After loading map data, fetch DB regions
+        try {
+          const { data: regions, error: regionsError } = await eden.api.regions.get();
+          if (regionsError) {
+            console.error("API Error fetching regions:", regionsError);
+          } else if (regions) {
+            setDbRegions(regions);
+          }
+        } catch (dbErr) {
+          console.error("Network error fetching DB regions. This usually happens if the API is unreachable:", dbErr);
+        }
+
         setLoading(false);
       } catch (err: any) {
         console.error(`Map fetch error (Source ${index + 1}):`, err);
@@ -355,6 +371,41 @@ export default function NepalInteractiveMap() {
                     })
                   }
                 </Geographies>
+
+                {dbRegions.map((region) => (
+                  <Marker 
+                    key={region._id} 
+                    coordinates={region.location.coordinates}
+                    onMouseEnter={() => {
+                      setHoveredDistrict({
+                        name: region.name,
+                        province: "Verified Hub",
+                        exports: region.exports.map((e: any) => e.name),
+                        description: region.description
+                      });
+                    }}
+                    onMouseLeave={() => setHoveredDistrict(null)}
+                  >
+                    <motion.circle
+                      r={6}
+                      fill="#F27D26"
+                      stroke="#fff"
+                      strokeWidth={2}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      whileHover={{ scale: 1.5 }}
+                      className="cursor-pointer shadow-lg"
+                    />
+                    <text
+                      textAnchor="middle"
+                      y={-15}
+                      className="text-[10px] font-bold fill-stone-700 pointer-events-none"
+                      style={{ fontFamily: "Inter, sans-serif" }}
+                    >
+                      {region.name}
+                    </text>
+                  </Marker>
+                ))}
               </ZoomableGroup>
             </ComposableMap>
           )}
