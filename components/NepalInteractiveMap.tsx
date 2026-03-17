@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ComposableMap,
   Geographies,
@@ -51,7 +52,7 @@ const PROVINCE_FALLBACK: Record<string, Partial<DistrictInfo>> = {
   "Sudurpashchim": { province: "Sudurpashchim", exports: ["Timber", "Herbs"], description: "Far-western region with forest resources." },
 };
 
-const DISTRICT_DATA: Record<string, DistrictInfo> = {
+export const DISTRICT_DATA: Record<string, DistrictInfo> = {
   "Kathmandu": {
     name: "Kathmandu",
     province: "Bagmati",
@@ -116,6 +117,7 @@ const DEFAULT_INFO: DistrictInfo = {
 };
 
 export default function NepalInteractiveMap() {
+  const router = useRouter();
   const [hoveredDistrict, setHoveredDistrict] = useState<DistrictInfo | null>(null);
   const [mounted, setMounted] = useState(false);
   const [geoData, setGeoData] = useState<any>(null);
@@ -346,6 +348,9 @@ export default function NepalInteractiveMap() {
                             fetchDistrictDetails(districtName, newInfo.province);
                           }}
                           onMouseLeave={() => setHoveredDistrict(null)}
+                          onClick={() => {
+                            router.push(`/region/${districtName.toLowerCase()}`);
+                          }}
                           style={{
                             default: {
                               fill: info ? "#10b981" : "#ecfdf5",
@@ -385,6 +390,9 @@ export default function NepalInteractiveMap() {
                       });
                     }}
                     onMouseLeave={() => setHoveredDistrict(null)}
+                    onClick={() => {
+                      router.push(`/region/${region.name.toLowerCase()}`);
+                    }}
                   >
                     <motion.circle
                       r={6}

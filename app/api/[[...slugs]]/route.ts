@@ -62,6 +62,9 @@ const app = new Elysia({ prefix: '/api' })
 
     return await Region.find().lean();
   })
+  .get('/regions/:name', async ({ params: { name } }) => {
+    return await Region.findOne({ name: new RegExp(`^${name}$`, 'i') }).lean();
+  })
   .get('/produce/:id', async ({ params: { id } }) => {
     const region = await Region.findOne({ 'exports._id': id }).lean();
     return region?.exports.find((e: any) => e._id.toString() === id) || null;
