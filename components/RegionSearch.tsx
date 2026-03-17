@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Search, ArrowRight, MapPin } from 'lucide-react';
+import { Search, ArrowRight, MapPin, Loader2 } from 'lucide-react';
+import { eden } from '@/lib/eden';
 
 interface Region {
   _id: string;
@@ -24,15 +25,58 @@ const FALLBACK_DISTRICTS = [
 
 export default function RegionSearch({ initialRegions }: RegionSearchProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [regions, setRegions] = useState<Region[]>(initialRegions);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  const handleSearchSubmit = (e?: React.FormEvent) => {
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (!searchQuery.trim()) {
+        setRegions(initialRegions);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const { data, error } = await eden.api.regions.get({
+          $query: { q: searchQuery }
+        });
+        if (!error && data) {
+          setRegions(data as Region[]);
+        }
+      } catch (err) {
+        console.error("Live search error:", err);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const timeoutId = setTimeout(fetchResults, 500);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, initialRegions]);
+
+  const handleSearchSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setShowSuggestions(false);
-    if (searchQuery.trim()) {
-      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    setIsSearching(true);
+    try {
+      const { data, error } = await eden.api.regions.get({
+        $query: { q: searchQuery }
+      });
+      
+      if (!error && data) {
+        setRegions(data as Region[]);
+      }
+    } catch (err) {
+      console.error("Search error:", err);
+    } finally {
+      setIsSearching(false);
+      if (searchQuery.trim()) {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   };
 
@@ -81,15 +125,6 @@ export default function RegionSearch({ initialRegions }: RegionSearchProps) {
     window.addEventListener('click', handleClickOutside);
     return () => window.removeEventListener('click', handleClickOutside);
   }, []);
-
-  const filteredRegions = initialRegions.filter((region) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      region.name.toLowerCase().includes(query) ||
-      region.description.toLowerCase().includes(query) ||
-      region.exports.some((exp) => exp.name.toLowerCase().includes(query))
-    );
-  });
 
   return (
     <>
@@ -164,22 +199,29 @@ export default function RegionSearch({ initialRegions }: RegionSearchProps) {
       {/* Regions Grid */}
       <section className="px-6 py-10 max-w-7xl mx-auto" ref={resultsRef}>
         <div className="space-y-6 max-w-4xl mx-auto">
-          <h3 className="text-3xl font-bold mb-8 text-center">
-            {searchQuery ? `Search Results (${filteredRegions.length})` : 'Featured Regions'}
-          </h3>
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <h3 className="text-3xl font-bold text-center">
+              {searchQuery ? `Search Results (${regions.length})` : 'Featured Regions'}
+            </h3>
+            {isSearching && <Loader2 className="animate-spin text-emerald-600" size={24} />}
+          </div>
           
-          {filteredRegions.length === 0 ? (
+          {regions.length === 0 ? (
             <div className="text-center py-20 bg-stone-50 rounded-3xl border-2 border-dashed border-stone-200">
               <p className="text-stone-400 text-lg">No regions found matching &quot;{searchQuery}&quot;</p>
               <button 
-                onClick={() => setSearchQuery('')}
+                onClick={async () => {
+                  setSearchQuery('');
+                  const { data } = await eden.api.regions.get();
+                  if (data) setRegions(data as Region[]);
+                }}
                 className="mt-4 text-emerald-600 font-semibold hover:underline"
               >
                 Clear search
               </button>
             </div>
           ) : (
-            filteredRegions.map((region) => (
+            regions.map((region) => (
               <Link href={`/region/${region.name.toLowerCase()}`} key={region._id}>
                 <div className="group bg-white p-8 rounded-3xl border border-stone-200 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-900/5 transition-all cursor-pointer mb-6">
                   <div className="flex justify-between items-start mb-4">

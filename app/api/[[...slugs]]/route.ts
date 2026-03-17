@@ -6,7 +6,12 @@ const app = new Elysia({ prefix: '/api' })
     // Ensure DB connection before handling any request
     await connectDB();
   })
-  .get('/regions', async () => {
+  .get('/regions', async ({ query }) => {
+    const { q } = query as Record<string, string | undefined>;
+    
+    // Ensure DB connection
+    await connectDB();
+
     // Seed mock data if empty for demonstration
     const count = await Region.countDocuments();
     if (count === 0) {
@@ -43,6 +48,18 @@ const app = new Elysia({ prefix: '/api' })
         }
       ]);
     }
+
+    if (q) {
+      const searchRegex = new RegExp(q, 'i');
+      return await Region.find({
+        $or: [
+          { name: searchRegex },
+          { description: searchRegex },
+          { 'exports.name': searchRegex }
+        ]
+      }).lean();
+    }
+
     return await Region.find().lean();
   })
   .get('/produce/:id', async ({ params: { id } }) => {
