@@ -143,9 +143,12 @@ export default function NepalInteractiveMap() {
       }
       
       const formattedProvince = apiProvince.replace(/\s+/g, '-');
-      const addrRes = await fetch(`https://nepaliaddress.up.railway.app/districts/${formattedProvince}`);
+      const addrRes = await fetch(`https://nepaliaddress.up.railway.app/districts/${formattedProvince}`, {
+        signal: AbortSignal.timeout(3000)
+      }).catch(() => null);
+
       let municipalities: string[] = [];
-      if (addrRes.ok) {
+      if (addrRes && addrRes.ok) {
         const addrData = await addrRes.json();
         // Find the district in the province data
         const districtData = addrData.find((d: any) => d.name.toLowerCase() === districtName.toLowerCase());
@@ -165,9 +168,12 @@ export default function NepalInteractiveMap() {
         );
         out body 5;
       `;
-      const overpassRes = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery)}`);
+      const overpassRes = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery)}`, {
+        signal: AbortSignal.timeout(5000)
+      }).catch(() => null);
+
       let pois: { name: string; type: string }[] = [];
-      if (overpassRes.ok) {
+      if (overpassRes && overpassRes.ok) {
         const overpassData = await overpassRes.json();
         pois = overpassData.elements.map((el: any) => ({
           name: el.tags.name || "Unnamed Facility",
