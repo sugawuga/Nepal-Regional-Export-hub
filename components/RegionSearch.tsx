@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, ArrowRight } from 'lucide-react';
+import { Search, ArrowRight, MapPin } from 'lucide-react';
 
 interface Region {
   _id: string;
@@ -17,6 +17,43 @@ interface RegionSearchProps {
 
 export default function RegionSearch({ initialRegions }: RegionSearchProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (searchQuery.length < 2) {
+        setSuggestions([]);
+        return;
+      }
+
+      try {
+        // Fetching from Nepal Address API for dynamic location suggestions
+        // We'll try to fetch from a few major provinces to get a good range of suggestions
+        const provinces = ['bagmati', 'koshi', 'gandaki', 'lumbini'];
+        const randomProvince = provinces[Math.floor(Math.random() * provinces.length)];
+        
+        const res = await fetch(`https://nepaliaddress.up.railway.app/districts/${randomProvince}`);
+        if (res.ok) {
+          const data = await res.json();
+          const districtNames = data.map((d: any) => d.name);
+          
+          // Also include initialRegions names
+          const localNames = initialRegions.map(r => r.name);
+          const allNames = Array.from(new Set([...districtNames, ...localNames]));
+
+          const filtered = allNames.filter((name: string) => 
+            name.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          setSuggestions(filtered.slice(0, 5));
+        }
+      } catch (err) {
+        console.error("Error fetching suggestions:", err);
+      }
+    };
+
+    const timeoutId = setTimeout(fetchSuggestions, 300);
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, initialRegions]);
 
   const filteredRegions = initialRegions.filter((region) => {
     const query = searchQuery.toLowerCase();
@@ -39,6 +76,22 @@ export default function RegionSearch({ initialRegions }: RegionSearchProps) {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-stone-200 bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all text-lg shadow-sm"
         />
+        
+        {/* Suggestions Dropdown */}
+        {suggestions.length > 0 && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-stone-200 rounded-2xl shadow-xl z-50 overflow-hidden">
+            {suggestions.map((suggestion, idx) => (
+              <button
+                key={idx}
+                onClick={() => setSearchQuery(suggestion)}
+                className="w-full px-6 py-3 text-left hover:bg-stone-50 flex items-center gap-3 text-stone-600 transition-colors"
+              >
+                <MapPin size={16} className="text-emerald-500" />
+                <span className="font-medium">{suggestion}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Regions Grid */}

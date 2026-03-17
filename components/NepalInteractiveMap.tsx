@@ -10,31 +10,42 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 
 // Reliable GeoJSON source for Nepal (Districts and States)
-const NEPAL_GEO_URL = 'https://raw.githubusercontent.com/mesaugat/geoJSON-Nepal/master/nepal-districts-new.geojson';
+const NEPAL_GEO_URL = 'https://raw.githubusercontent.com/mesaugat/geoJSON-Nepal/master/nepal-districts.geojson';
 const NEPAL_GEO_URL_FALLBACK_1 = 'https://raw.githubusercontent.com/mesaugat/geoJSON-Nepal/master/nepal-states.geojson';
-const NEPAL_GEO_URL_FALLBACK_2 = 'https://raw.githubusercontent.com/nepal-maps/nepal-geojson/master/districts.json';
+const NEPAL_GEO_URL_FALLBACK_2 = 'https://raw.githubusercontent.com/longitood/npl-geojson/master/npl-districts.geojson';
+const NEPAL_GEO_URL_FALLBACK_3 = 'https://raw.githubusercontent.com/Anuj-Sapkota/Nepal-GeoJSON/main/districts.json';
+const NEPAL_GEO_URL_FALLBACK_4 = 'https://raw.githubusercontent.com/sagar-sharma7/nepal-geojson/master/districts.json';
 
 export interface DistrictInfo {
   name: string;
   province: string;
   exports: string[];
   description: string;
+  municipalities?: string[];
+  livePois?: { name: string; type: string }[];
 }
 
 const PROVINCE_FALLBACK: Record<string, Partial<DistrictInfo>> = {
   "1": { province: "Koshi", exports: ["Tea", "Cardamom"], description: "Eastern region known for tea and agriculture." },
+  "koshi": { province: "Koshi", exports: ["Tea", "Cardamom"], description: "Eastern region known for tea and agriculture." },
   "Koshi": { province: "Koshi", exports: ["Tea", "Cardamom"], description: "Eastern region known for tea and agriculture." },
   "2": { province: "Madhesh", exports: ["Rice", "Sugarcane"], description: "Southern plains, the granary of Nepal." },
+  "madhesh": { province: "Madhesh", exports: ["Rice", "Sugarcane"], description: "Southern plains, the granary of Nepal." },
   "Madhesh": { province: "Madhesh", exports: ["Rice", "Sugarcane"], description: "Southern plains, the granary of Nepal." },
   "3": { province: "Bagmati", exports: ["Handicrafts", "Services"], description: "Central hub including the capital city." },
+  "bagmati": { province: "Bagmati", exports: ["Handicrafts", "Services"], description: "Central hub including the capital city." },
   "Bagmati": { province: "Bagmati", exports: ["Handicrafts", "Services"], description: "Central hub including the capital city." },
   "4": { province: "Gandaki", exports: ["Tourism", "Apples"], description: "Mountainous region with high tourism value." },
+  "gandaki": { province: "Gandaki", exports: ["Tourism", "Apples"], description: "Mountainous region with high tourism value." },
   "Gandaki": { province: "Gandaki", exports: ["Tourism", "Apples"], description: "Mountainous region with high tourism value." },
   "5": { province: "Lumbini", exports: ["Cement", "Agriculture"], description: "Industrial and agricultural center." },
+  "lumbini": { province: "Lumbini", exports: ["Cement", "Agriculture"], description: "Industrial and agricultural center." },
   "Lumbini": { province: "Lumbini", exports: ["Cement", "Agriculture"], description: "Industrial and agricultural center." },
   "6": { province: "Karnali", exports: ["Herbs", "Apples"], description: "Remote region rich in medicinal herbs." },
+  "karnali": { province: "Karnali", exports: ["Herbs", "Apples"], description: "Remote region rich in medicinal herbs." },
   "Karnali": { province: "Karnali", exports: ["Herbs", "Apples"], description: "Remote region rich in medicinal herbs." },
   "7": { province: "Sudurpashchim", exports: ["Timber", "Herbs"], description: "Far-western region with forest resources." },
+  "sudurpashchim": { province: "Sudurpashchim", exports: ["Timber", "Herbs"], description: "Far-western region with forest resources." },
   "Sudurpashchim": { province: "Sudurpashchim", exports: ["Timber", "Herbs"], description: "Far-western region with forest resources." },
 };
 
@@ -68,6 +79,30 @@ const DISTRICT_DATA: Record<string, DistrictInfo> = {
     province: "Lumbini",
     exports: ["Cement", "Processed Foods", "Tourism"],
     description: "An industrial powerhouse and home to Lumbini, the birthplace of Buddha."
+  },
+  "Jhapa": {
+    name: "Jhapa",
+    province: "Koshi",
+    exports: ["Tea", "Rice", "Betel Nut"],
+    description: "The easternmost district, a major agricultural producer and gateway to India."
+  },
+  "Chitwan": {
+    name: "Chitwan",
+    province: "Bagmati",
+    exports: ["Poultry", "Honey", "Tourism"],
+    description: "Famous for its national park and as a leading producer of poultry and honey."
+  },
+  "Banke": {
+    name: "Banke",
+    province: "Lumbini",
+    exports: ["Herbs", "Leather", "Essential Oils"],
+    description: "A key trading hub in the west with significant forest-based industries."
+  },
+  "Morang": {
+    name: "Morang",
+    province: "Koshi",
+    exports: ["Jute", "Sugar", "Garments"],
+    description: "One of Nepal's oldest industrial districts with diverse manufacturing."
   }
 };
 
@@ -84,11 +119,87 @@ export default function NepalInteractiveMap() {
   const [geoData, setGeoData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [fetchingDetails, setFetchingDetails] = useState(false);
+
+  const fetchDistrictDetails = async (districtName: string, provinceName: string) => {
+    if (!provinceName || provinceName.toLowerCase().includes('unknown')) {
+      setFetchingDetails(false);
+      return;
+    }
+
+    setFetchingDetails(true);
+    try {
+      // Normalize province name for the API (e.g., "Province 3" -> "bagmati", "Koshi" -> "koshi")
+      let apiProvince = provinceName.toLowerCase().replace('province', '').trim();
+      
+      // Map numeric IDs to names if necessary
+      const idToName: Record<string, string> = {
+        "1": "koshi", "2": "madhesh", "3": "bagmati", "4": "gandaki", 
+        "5": "lumbini", "6": "karnali", "7": "sudurpashchim"
+      };
+      
+      if (idToName[apiProvince]) {
+        apiProvince = idToName[apiProvince];
+      }
+      
+      const formattedProvince = apiProvince.replace(/\s+/g, '-');
+      const addrRes = await fetch(`https://nepaliaddress.up.railway.app/districts/${formattedProvince}`);
+      let municipalities: string[] = [];
+      if (addrRes.ok) {
+        const addrData = await addrRes.json();
+        // Find the district in the province data
+        const districtData = addrData.find((d: any) => d.name.toLowerCase() === districtName.toLowerCase());
+        if (districtData && districtData.municipalities) {
+          municipalities = districtData.municipalities;
+        }
+      }
+
+      // 2. Fetch Live POIs from Overpass API (Agricultural markets/shops)
+      const overpassQuery = `
+        [out:json][timeout:25];
+        area["name"="${districtName}"]->.searchArea;
+        (
+          node["amenity"="marketplace"](area.searchArea);
+          node["shop"="farm"](area.searchArea);
+          node["industrial"="factory"](area.searchArea);
+        );
+        out body 5;
+      `;
+      const overpassRes = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery)}`);
+      let pois: { name: string; type: string }[] = [];
+      if (overpassRes.ok) {
+        const overpassData = await overpassRes.json();
+        pois = overpassData.elements.map((el: any) => ({
+          name: el.tags.name || "Unnamed Facility",
+          type: el.tags.amenity || el.tags.shop || el.tags.industrial || "Commercial"
+        }));
+      }
+
+      setHoveredDistrict(prev => {
+        if (!prev || prev.name !== districtName) return prev;
+        return {
+          ...prev,
+          municipalities: municipalities.length > 0 ? municipalities : undefined,
+          livePois: pois.length > 0 ? pois : undefined
+        };
+      });
+    } catch (err) {
+      console.error("Error fetching dynamic details:", err);
+    } finally {
+      setFetchingDetails(false);
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
     
-    const urls = [NEPAL_GEO_URL, NEPAL_GEO_URL_FALLBACK_1, NEPAL_GEO_URL_FALLBACK_2];
+    const urls = [
+      NEPAL_GEO_URL, 
+      NEPAL_GEO_URL_FALLBACK_1, 
+      NEPAL_GEO_URL_FALLBACK_2,
+      NEPAL_GEO_URL_FALLBACK_3,
+      NEPAL_GEO_URL_FALLBACK_4
+    ];
     
     const fetchMapData = async (index: number) => {
       if (index >= urls.length) {
@@ -99,8 +210,12 @@ export default function NepalInteractiveMap() {
 
       try {
         const res = await fetch(urls[index], { mode: 'cors' });
-        if (!res.ok) throw new Error(`Status: ${res.status}`);
+        if (!res.ok) throw new Error(`Status: ${res.status} for ${urls[index]}`);
         const data = await res.json();
+        if (!data.features && !data.geometries && !data.objects) {
+          throw new Error(`Invalid GeoJSON structure from ${urls[index]}`);
+        }
+        console.log(`Successfully loaded map data from source ${index + 1}: ${urls[index]}`);
         setGeoData(data);
         setLoading(false);
       } catch (err: any) {
@@ -173,25 +288,40 @@ export default function NepalInteractiveMap() {
                   {({ geographies }) =>
                     geographies.map((geo) => {
                       const props = geo.properties;
-                      // Handle different GeoJSON property naming conventions for both districts and states
-                      const districtName = props.DISTRICT || props.name || props.NAME_3 || props.district || props.STATE_NAME || props.province || "Unknown";
-                      const provinceId = props.PROVINCE || props.PR_NAME || props.NAME_1 || props.province || props.STATE_NAME;
+                      // Handle different GeoJSON property naming conventions
+                      // Common keys: DISTRICT, name, NAME_3, district, STATE_NAME, province, PR_NAME, NAME_1
+                      const districtName = props.DISTRICT || props.name || props.NAME_3 || props.district || props.STATE_NAME || props.province || props.NAME || "Unknown";
+                      let provinceId = props.PROVINCE || props.PR_NAME || props.NAME_1 || props.province || props.STATE_NAME || props.PR_ID;
                       
+                      // Debug log to see what properties are available (only in dev)
+                      if (process.env.NODE_ENV === 'development' && geo.rsmKey === geographies[0]?.rsmKey) {
+                        console.log("GeoJSON Properties Sample:", props);
+                      }
+
+                      // Normalize provinceId if it's a string like "Province 3"
+                      if (typeof provinceId === 'string' && provinceId.toLowerCase().includes('province')) {
+                        provinceId = provinceId.toLowerCase().replace('province', '').trim();
+                      }
+
                       // Try to find data by district name first, then by province name/id
                       const info = DISTRICT_DATA[districtName] || PROVINCE_FALLBACK[provinceId] || PROVINCE_FALLBACK[districtName];
                       const fallback = info || PROVINCE_FALLBACK[provinceId] || {};
+                      
+                      const finalProvinceName = fallback.province || (provinceId && PROVINCE_FALLBACK[provinceId]?.province) || `Province ${provinceId || 'Unknown'}`;
 
                       return (
                         <Geography
                           key={geo.rsmKey}
                           geography={geo}
                           onMouseEnter={() => {
-                            setHoveredDistrict(info || {
+                            const newInfo = info || {
                               name: districtName,
-                              province: fallback.province || `Province ${provinceId || 'Unknown'}`,
+                              province: finalProvinceName,
                               exports: fallback.exports || ["Local Produce"],
                               description: fallback.description || `A key district in Nepal. Regional export data is currently being updated for this area.`
-                            });
+                            };
+                            setHoveredDistrict(newInfo);
+                            fetchDistrictDetails(districtName, newInfo.province);
                           }}
                           onMouseLeave={() => setHoveredDistrict(null)}
                           style={{
@@ -276,6 +406,50 @@ export default function NepalInteractiveMap() {
                   ))}
                 </div>
               </div>
+
+              {/* Dynamic Metadata: Municipalities */}
+              {displayInfo.municipalities && (
+                <div className="mt-8 space-y-4">
+                  <h4 className="text-stone-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                    Key Municipalities
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {displayInfo.municipalities.slice(0, 6).map((m, idx) => (
+                      <span key={idx} className="text-xs text-stone-400 bg-stone-800/30 px-3 py-1 rounded-lg">
+                        {m}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Live Geospatial Data: POIs */}
+              {displayInfo.livePois && (
+                <div className="mt-8 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-stone-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                      Live Infrastructure (OSM)
+                    </h4>
+                    <span className="text-[8px] text-emerald-500 font-bold animate-pulse">LIVE</span>
+                  </div>
+                  <div className="space-y-2">
+                    {displayInfo.livePois.map((poi, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-xs text-stone-300">
+                        <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
+                        <span className="font-bold">{poi.name}</span>
+                        <span className="text-stone-500 italic">({poi.type})</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {fetchingDetails && (
+                <div className="mt-8 flex items-center gap-2 text-emerald-500 text-[10px] font-bold uppercase tracking-widest">
+                  <div className="w-3 h-3 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                  Updating Live Data...
+                </div>
+              )}
 
               <div className="mt-12 pt-8 border-t border-stone-800/50 flex items-center justify-between">
                 <div className="flex -space-x-3">

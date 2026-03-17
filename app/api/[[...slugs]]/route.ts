@@ -28,6 +28,18 @@ const app = new Elysia({ prefix: '/api' })
           description: 'The city of devotees, renowned for its traditional pottery and yogurt.',
           location: { type: 'Point', coordinates: [85.4295, 27.6710] },
           exports: [{ name: 'Bhaktapur Pottery', description: 'Handcrafted clay pottery.', category: 'Handicraft', price: 25 }]
+        },
+        {
+          name: 'Chitwan',
+          description: 'The heart of the jungle, famous for wildlife and poultry.',
+          location: { type: 'Point', coordinates: [84.4167, 27.5833] },
+          exports: [{ name: 'Poultry', description: 'High quality poultry products.', category: 'Agriculture', price: 10 }]
+        },
+        {
+          name: 'Jhapa',
+          description: 'The granary of Nepal, major producer of rice and tea.',
+          location: { type: 'Point', coordinates: [87.9833, 26.6333] },
+          exports: [{ name: 'Betel Nut', description: 'High quality betel nuts.', category: 'Agriculture', price: 8 }]
         }
       ]);
     }
