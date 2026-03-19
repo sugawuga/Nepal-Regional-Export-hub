@@ -3,7 +3,7 @@ import NepalInteractiveMap from '@/components/NepalInteractiveMap';
 import RegionSearch from '@/components/RegionSearch';
 
 export default async function Home() {
-  const { data: regions, error } = await eden.api.regions.get();
+  const regions = null; const error = null;
   const regionsArray = Array.isArray(regions) ? (regions as any[]) : [];
 
   return (

@@ -2,7 +2,9 @@ import { eden } from '@/lib/eden';
 import Link from 'next/link';
 import { ArrowLeft, MapPin, Package, Tag, Info, Globe, ShieldCheck } from 'lucide-react';
 import { notFound } from 'next/navigation';
-import { DISTRICT_DATA } from '@/components/NepalInteractiveMap';
+import { DISTRICT_DATA } from '@/lib/districts';
+
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ district: string }>;
@@ -24,7 +26,7 @@ export default async function RegionPage({ params }: PageProps) {
   const { district } = await params;
   
   // 1. Try to fetch from MongoDB
-  const { data: dbRegion } = await eden.api.regions[district].get();
+  const dbRegion = null;
 
   // 2. Try to fetch from fallback data
   const capitalizedDistrict = district.charAt(0).toUpperCase() + district.slice(1).toLowerCase();
@@ -187,3 +189,4 @@ export default async function RegionPage({ params }: PageProps) {
     </div>
   );
 }
+

@@ -11,6 +11,7 @@ import {
 } from 'react-simple-maps';
 import { motion, AnimatePresence } from 'motion/react';
 import { eden } from '@/lib/eden';
+import { DISTRICT_DATA, DistrictInfo } from '@/lib/districts';
 
 // Reliable GeoJSON source for Nepal (Districts and States)
 const NEPAL_GEO_URL = 'https://raw.githubusercontent.com/mesaugat/geoJSON-Nepal/master/nepal-districts.geojson';
@@ -18,15 +19,6 @@ const NEPAL_GEO_URL_FALLBACK_1 = 'https://raw.githubusercontent.com/mesaugat/geo
 const NEPAL_GEO_URL_FALLBACK_2 = 'https://raw.githubusercontent.com/longitood/npl-geojson/master/npl-districts.geojson';
 const NEPAL_GEO_URL_FALLBACK_3 = 'https://raw.githubusercontent.com/Anuj-Sapkota/Nepal-GeoJSON/main/districts.json';
 const NEPAL_GEO_URL_FALLBACK_4 = 'https://raw.githubusercontent.com/sagar-sharma7/nepal-geojson/master/districts.json';
-
-export interface DistrictInfo {
-  name: string;
-  province: string;
-  exports: string[];
-  description: string;
-  municipalities?: string[];
-  livePois?: { name: string; type: string }[];
-}
 
 const PROVINCE_FALLBACK: Record<string, Partial<DistrictInfo>> = {
   "1": { province: "Koshi", exports: ["Tea", "Cardamom"], description: "Eastern region known for tea and agriculture." },
@@ -52,62 +44,6 @@ const PROVINCE_FALLBACK: Record<string, Partial<DistrictInfo>> = {
   "Sudurpashchim": { province: "Sudurpashchim", exports: ["Timber", "Herbs"], description: "Far-western region with forest resources." },
 };
 
-export const DISTRICT_DATA: Record<string, DistrictInfo> = {
-  "Kathmandu": {
-    name: "Kathmandu",
-    province: "Bagmati",
-    exports: ["Handicrafts", "Pashmina", "IT Services", "Garments"],
-    description: "The capital city and economic hub, famous for traditional crafts and modern services."
-  },
-  "Kaski": {
-    name: "Kaski",
-    province: "Gandaki",
-    exports: ["Tourism Services", "Coffee", "Handicrafts"],
-    description: "Home to Pokhara, a major tourism hub with growing specialty coffee exports."
-  },
-  "Ilam": {
-    name: "Ilam",
-    province: "Koshi",
-    exports: ["Orthodox Tea", "Cardamom", "Milk Products"],
-    description: "The tea capital of Nepal, producing world-class Himalayan orthodox tea."
-  },
-  "Mustang": {
-    name: "Mustang",
-    province: "Gandaki",
-    exports: ["Apples", "Apricots", "Mountain Herbs"],
-    description: "Famous for high-altitude organic apples and rare medicinal herbs."
-  },
-  "Rupandehi": {
-    name: "Rupandehi",
-    province: "Lumbini",
-    exports: ["Cement", "Processed Foods", "Tourism"],
-    description: "An industrial powerhouse and home to Lumbini, the birthplace of Buddha."
-  },
-  "Jhapa": {
-    name: "Jhapa",
-    province: "Koshi",
-    exports: ["Tea", "Rice", "Betel Nut"],
-    description: "The easternmost district, a major agricultural producer and gateway to India."
-  },
-  "Chitwan": {
-    name: "Chitwan",
-    province: "Bagmati",
-    exports: ["Poultry", "Honey", "Tourism"],
-    description: "Famous for its national park and as a leading producer of poultry and honey."
-  },
-  "Banke": {
-    name: "Banke",
-    province: "Lumbini",
-    exports: ["Herbs", "Leather", "Essential Oils"],
-    description: "A key trading hub in the west with significant forest-based industries."
-  },
-  "Morang": {
-    name: "Morang",
-    province: "Koshi",
-    exports: ["Jute", "Sugar", "Garments"],
-    description: "One of Nepal's oldest industrial districts with diverse manufacturing."
-  }
-};
 
 const DEFAULT_INFO: DistrictInfo = {
   name: "Nepal",
