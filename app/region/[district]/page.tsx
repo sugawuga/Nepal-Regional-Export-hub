@@ -4,6 +4,7 @@ import { ArrowLeft, MapPin, Package, Tag, Info, Globe, ShieldCheck } from 'lucid
 import { notFound } from 'next/navigation';
 import { DISTRICT_DATA, slugifyDistrictName } from '@/lib/districts';
 import InquiryForm from '@/components/InquiryForm';
+import InquiryModal from '@/components/InquiryModal';
 
 export const dynamic = 'force-dynamic';
 
@@ -216,19 +217,13 @@ export default async function RegionPage({ params }: PageProps) {
             <p className="text-emerald-100 leading-relaxed text-lg mb-8">
               We facilitate direct connections with verified producers in {region.name}. Our platform ensures transparency, fair pricing, and quality assurance from the source to the global market.
             </p>
-            <a href="#inquiry-form" className="inline-flex px-8 py-4 bg-white text-emerald-800 rounded-2xl font-bold hover:bg-emerald-50 transition-colors">
-              Inquire About Supply
-            </a>
+            <InquiryModal
+              regionId={region._id}
+              regionName={region.name}
+              regionProvince={region.province}
+              products={region.products.map((item) => ({ _id: item._id, slug: item.slug, name: item.name }))}
+            />
           </div>
-        </div>
-
-        <div className="mt-20">
-          <InquiryForm
-            regionId={region._id}
-            regionName={region.name}
-            regionProvince={region.province}
-            products={region.products.map((item) => ({ _id: item._id, slug: item.slug, name: item.name }))}
-          />
         </div>
       </main>
     </div>

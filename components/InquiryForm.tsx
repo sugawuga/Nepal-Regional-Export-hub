@@ -14,9 +14,10 @@ type InquiryFormProps = {
   regionName: string;
   regionProvince: string;
   products: ProductOption[];
+  onSuccess?: () => void;
 };
 
-export default function InquiryForm({ regionId, regionName, regionProvince, products }: InquiryFormProps) {
+export default function InquiryForm({ regionId, regionName, regionProvince, products, onSuccess }: InquiryFormProps) {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -71,6 +72,9 @@ export default function InquiryForm({ regionId, regionName, regionProvince, prod
       setQuantity('');
       setProductId('');
       setMessage('');
+      if (onSuccess) {
+        setTimeout(onSuccess, 2000); // Close after 2 seconds on success
+      }
     } catch (err: any) {
       setError(err?.message || 'Unable to submit inquiry');
     } finally {
@@ -79,7 +83,7 @@ export default function InquiryForm({ regionId, regionName, regionProvince, prod
   };
 
   return (
-    <section id="inquiry-form" className="scroll-mt-28 bg-white rounded-[2rem] border border-stone-200 shadow-sm p-8 md:p-10">
+    <section id="inquiry-form" className="bg-white rounded-[2rem] p-8 md:p-10">
       <div className="max-w-3xl">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold uppercase tracking-widest mb-5">
           <Send size={12} />
@@ -103,7 +107,7 @@ export default function InquiryForm({ regionId, regionName, regionProvince, prod
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50 pl-10 pr-4 py-3 outline-none focus:border-emerald-400"
+                  className="w-full rounded-2xl border border-stone-200 bg-stone-50 text-black pl-10 pr-4 py-3 outline-none focus:border-emerald-400"
                   placeholder="Your name"
                 />
               </div>
@@ -118,7 +122,7 @@ export default function InquiryForm({ regionId, regionName, regionProvince, prod
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50 pl-10 pr-4 py-3 outline-none focus:border-emerald-400"
+                  className="w-full rounded-2xl border border-stone-200 bg-stone-50 text-black pl-10 pr-4 py-3 outline-none focus:border-emerald-400"
                   placeholder="you@example.com"
                 />
               </div>
@@ -133,7 +137,7 @@ export default function InquiryForm({ regionId, regionName, regionProvince, prod
                 <input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50 pl-10 pr-4 py-3 outline-none focus:border-emerald-400"
+                  className="w-full rounded-2xl border border-stone-200 bg-stone-50 text-black pl-10 pr-4 py-3 outline-none focus:border-emerald-400"
                   placeholder="Optional phone"
                 />
               </div>
@@ -144,7 +148,7 @@ export default function InquiryForm({ regionId, regionName, regionProvince, prod
               <input
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
-                className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none focus:border-emerald-400"
+                className="w-full rounded-2xl border border-stone-200 bg-stone-50 text-black px-4 py-3 outline-none focus:border-emerald-400"
                 placeholder="Optional company"
               />
             </label>
@@ -156,7 +160,7 @@ export default function InquiryForm({ regionId, regionName, regionProvince, prod
               <select
                 value={productId}
                 onChange={(e) => setProductId(e.target.value)}
-                className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none focus:border-emerald-400"
+                className="w-full rounded-2xl border border-stone-200 bg-stone-50 text-black px-4 py-3 outline-none focus:border-emerald-400"
               >
                 <option value="">General region inquiry</option>
                 {products.map((product) => (
@@ -172,7 +176,7 @@ export default function InquiryForm({ regionId, regionName, regionProvince, prod
               <input
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none focus:border-emerald-400"
+                className="w-full rounded-2xl border border-stone-200 bg-stone-50 text-black px-4 py-3 outline-none focus:border-emerald-400"
                 placeholder="For example: 500 kg or 200 units"
               />
             </label>
@@ -187,7 +191,7 @@ export default function InquiryForm({ regionId, regionName, regionProvince, prod
                 onChange={(e) => setMessage(e.target.value)}
                 required
                 rows={6}
-                className="w-full rounded-2xl border border-stone-200 bg-stone-50 pl-10 pr-4 py-3 outline-none focus:border-emerald-400"
+                 className="w-full rounded-2xl border border-stone-200 bg-stone-50 text-black pl-10 pr-4 py-3 outline-none focus:border-emerald-400"
                 placeholder="Tell us what you need, target timeline, and any delivery details"
               />
             </div>
