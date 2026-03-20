@@ -129,14 +129,14 @@ export default async function ExportsPage() {
 
           <div className="flex flex-wrap gap-3 mb-14">
             {commodityGroups.map((commodity) => (
-              <a
+              <Link
                 key={commodity.slug}
-                href={`#${commodity.slug}`}
+                href={`/exports/${commodity.slug}`}
                 className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm text-stone-600 hover:border-emerald-300 hover:text-emerald-700 transition-colors shadow-sm"
               >
                 <Tag size={14} />
                 {commodity.name}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -149,11 +149,11 @@ export default async function ExportsPage() {
             const remainingCount = commodity.regions.length - visibleRegions.length;
 
             return (
-              <article
-                key={commodity.slug}
-                id={commodity.slug}
-                className="bg-white rounded-[2rem] border border-stone-200 shadow-sm hover:shadow-lg hover:border-emerald-200 transition-all p-8 scroll-mt-28"
-              >
+              <Link key={commodity.slug} href={`/exports/${commodity.slug}`} className="block">
+                <article
+                  id={commodity.slug}
+                  className="bg-white rounded-[2rem] border border-stone-200 shadow-sm hover:shadow-lg hover:border-emerald-200 transition-all p-8 scroll-mt-28"
+                >
                 <div className="flex items-start justify-between gap-4 mb-6">
                   <div>
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-wider mb-4">
@@ -172,15 +172,14 @@ export default async function ExportsPage() {
 
                 <div className="flex flex-wrap gap-2">
                   {visibleRegions.map((region) => (
-                    <Link
+                    <span
                       key={region.slug}
-                      href={`/region/${region.slug}`}
-                      className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-2 text-sm text-stone-700 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                      className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-2 text-sm text-stone-700"
                     >
                       <MapPin size={14} className="text-emerald-600" />
                       <span className="font-medium">{region.name}</span>
                       <span className="text-stone-400 text-xs">{region.province}</span>
-                    </Link>
+                    </span>
                   ))}
                   {remainingCount > 0 && (
                     <div className="inline-flex items-center rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-4 py-2 text-sm text-stone-500">
@@ -188,7 +187,8 @@ export default async function ExportsPage() {
                     </div>
                   )}
                 </div>
-              </article>
+                </article>
+              </Link>
             );
           })}
         </div>

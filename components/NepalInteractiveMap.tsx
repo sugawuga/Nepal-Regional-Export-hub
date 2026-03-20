@@ -10,6 +10,7 @@ import {
   Marker
 } from 'react-simple-maps';
 import { motion, AnimatePresence } from 'motion/react';
+import Link from 'next/link';
 import { eden } from '@/lib/eden';
 import { DISTRICT_DATA, DistrictInfo, slugifyDistrictName } from '@/lib/districts';
 
@@ -401,12 +402,13 @@ export default function NepalInteractiveMap() {
                 </h4>
                 <div className="flex flex-wrap gap-2.5">
                   {displayInfo.exports.map((item, idx) => (
-                    <span
+                    <Link
                       key={idx}
-                      className="px-5 py-2.5 bg-stone-800/50 border border-stone-700/50 rounded-2xl text-sm font-bold text-emerald-300 hover:bg-emerald-500 hover:text-white transition-all duration-300 cursor-default"
+                      href={`/exports/${item.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')}`}
+                      className="px-5 py-2.5 bg-stone-800/50 border border-stone-700/50 rounded-2xl text-sm font-bold text-emerald-300 hover:bg-emerald-500 hover:text-white transition-all duration-300 cursor-pointer"
                     >
                       {item}
-                    </span>
+                    </Link>
                   ))}
                 </div>
               </div>
