@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ComposableMap,
@@ -62,6 +62,22 @@ export default function NepalInteractiveMap() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [fetchingDetails, setFetchingDetails] = useState(false);
+  const hoverDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearHoverDelay = () => {
+    if (hoverDelayRef.current) {
+      clearTimeout(hoverDelayRef.current);
+      hoverDelayRef.current = null;
+    }
+  };
+
+  const scheduleHoverUpdate = (districtName: string, newInfo: DistrictInfo) => {
+    clearHoverDelay();
+    hoverDelayRef.current = setTimeout(() => {
+      setHoveredDistrict(newInfo);
+      fetchDistrictDetails(districtName, newInfo.province);
+    }, 250);
+  };
 
   const fetchDistrictDetails = async (districtName: string, provinceName: string) => {
     if (!provinceName || provinceName.toLowerCase().includes('unknown')) {
@@ -284,9 +300,9 @@ export default function NepalInteractiveMap() {
                               exports: fallback.exports || ["Local Produce"],
                               description: fallback.description || `A key district in Nepal. Regional export data is currently being updated for this area.`
                             };
-                            setHoveredDistrict(newInfo);
-                            fetchDistrictDetails(districtName, newInfo.province);
+                            scheduleHoverUpdate(districtName, newInfo);
                           }}
+                          onMouseLeave={clearHoverDelay}
                           onClick={() => {
                             router.push(`/region/${slugifyDistrictName(districtName)}`);
                           }}
@@ -321,13 +337,14 @@ export default function NepalInteractiveMap() {
                     key={region._id} 
                     coordinates={region.location.coordinates}
                     onMouseEnter={() => {
-                      setHoveredDistrict({
+                      scheduleHoverUpdate(region.name, {
                         name: region.name,
                         province: region.is_verified ? (region.province || "Verified Hub") : (region.province || "Unverified"),
                         exports: region.exports.map((e: any) => e.name),
                         description: region.description
                       });
                     }}
+                      onMouseLeave={clearHoverDelay}
                     onClick={() => {
                       router.push(`/region/${slugifyDistrictName(region.name)}`);
                     }}
