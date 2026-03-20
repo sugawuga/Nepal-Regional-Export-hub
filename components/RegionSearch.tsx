@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Search, ArrowRight, MapPin, Loader2 } from 'lucide-react';
 import { eden } from '@/lib/eden';
+import { DISTRICT_NAMES, slugifyDistrictName } from '@/lib/districts';
 
 interface Region {
   _id: string;
@@ -15,13 +16,6 @@ interface Region {
 interface RegionSearchProps {
   initialRegions: Region[];
 }
-
-const FALLBACK_DISTRICTS = [
-  "Kathmandu", "Lalitpur", "Bhaktapur", "Pokhara", "Kaski", "Ilam", "Jhapa", "Morang", 
-  "Sunsari", "Chitwan", "Rupandehi", "Banke", "Surkhet", "Kailali", "Kanchanpur", 
-  "Mustang", "Manang", "Solukhumbu", "Gorkha", "Dhading", "Nuwakot", "Kavrepalanchok",
-  "Sindhupalchok", "Dolakha", "Ramechhap", "Sindhuli", "Makwanpur", "Rautahat", "Bara", "Parsa"
-];
 
 export default function RegionSearch({ initialRegions }: RegionSearchProps) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -101,7 +95,7 @@ export default function RegionSearch({ initialRegions }: RegionSearchProps) {
         .map(e => e.name);
 
       // 3. Match from Fallback Districts (Locations)
-      const locationMatches = FALLBACK_DISTRICTS.filter(d => 
+      const locationMatches = DISTRICT_NAMES.filter(d => 
         d.toLowerCase().includes(query)
       );
 
@@ -222,7 +216,7 @@ export default function RegionSearch({ initialRegions }: RegionSearchProps) {
             </div>
           ) : (
             regions.map((region) => (
-              <Link href={`/region/${region.name.toLowerCase()}`} key={region._id}>
+              <Link href={`/region/${slugifyDistrictName(region.name)}`} key={region._id}>
                 <div className="group bg-white p-8 rounded-3xl border border-stone-200 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-900/5 transition-all cursor-pointer mb-6">
                   <div className="flex justify-between items-start mb-4">
                     <h4 className="text-2xl font-semibold text-stone-900 group-hover:text-emerald-700 transition-colors">{region.name}</h4>

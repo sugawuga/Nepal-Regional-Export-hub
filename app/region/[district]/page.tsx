@@ -1,8 +1,9 @@
 import { eden } from '@/lib/eden';
+import { connectDB, Region as RegionModel } from '@/lib/db';
 import Link from 'next/link';
 import { ArrowLeft, MapPin, Package, Tag, Info, Globe, ShieldCheck } from 'lucide-react';
 import { notFound } from 'next/navigation';
-import { DISTRICT_DATA } from '@/lib/districts';
+import { DISTRICT_DATA, slugifyDistrictName } from '@/lib/districts';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,7 @@ interface PageProps {
 
 interface Region {
   name: string;
+  province: string;
   description: string;
   location: { coordinates: number[] };
   exports: {
@@ -24,13 +26,16 @@ interface Region {
 
 export default async function RegionPage({ params }: PageProps) {
   const { district } = await params;
-  
-  // 1. Try to fetch from MongoDB
-  const dbRegion = null;
+  const districtSlug = decodeURIComponent(district);
 
-  // 2. Try to fetch from fallback data
-  const capitalizedDistrict = district.charAt(0).toUpperCase() + district.slice(1).toLowerCase();
-  const fallbackData = DISTRICT_DATA[capitalizedDistrict];
+  // 1. Try to fetch from MongoDB (server-side)
+  await connectDB();
+  const dbRegion = await RegionModel.findOne({ name: new RegExp(`^${districtSlug.replace(/-/g, ' ')}$`, 'i') }).lean();
+
+  // 2. Fallback to in-memory district data if the DB doesn't have it
+  const fallbackData =
+    Object.entries(DISTRICT_DATA).find(([, value]) => slugifyDistrictName(value.name) === slugifyDistrictName(districtSlug))?.[1] ||
+    DISTRICT_DATA[districtSlug];
 
   if (!dbRegion && !fallbackData) {
     return notFound();
@@ -39,11 +44,13 @@ export default async function RegionPage({ params }: PageProps) {
   // Normalize data
   const region: Region = dbRegion ? {
     name: (dbRegion as any).name,
+    province: (dbRegion as any).province,
     description: (dbRegion as any).description,
     location: (dbRegion as any).location,
     exports: (dbRegion as any).exports
   } : {
     name: fallbackData.name,
+    province: fallbackData.province,
     description: fallbackData.description,
     location: { coordinates: [84.1240, 28.3949] }, // Default center of Nepal
     exports: fallbackData.exports.map(e => ({

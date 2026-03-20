@@ -1,5 +1,6 @@
 import { Elysia, t } from 'elysia';
 import { connectDB, Region } from '@/lib/db';
+import { getSeedRegions } from '@/lib/seed-data';
 
 const app = new Elysia({ prefix: '/api' })
   .onBeforeHandle(async () => {
@@ -15,38 +16,7 @@ const app = new Elysia({ prefix: '/api' })
     // Seed mock data if empty for demonstration
     const count = await Region.countDocuments();
     if (count === 0) {
-      await Region.create([
-        {
-          name: 'Ilam',
-          description: 'Famous for its rolling tea gardens and pristine landscapes.',
-          location: { type: 'Point', coordinates: [87.9236, 26.9155] },
-          exports: [{ name: 'Ilam Tea', description: 'Orthodox tea with a rich aroma.', category: 'Beverage', price: 15 }]
-        },
-        {
-          name: 'Mustang',
-          description: 'High altitude desert known for sweet apples and ancient culture.',
-          location: { type: 'Point', coordinates: [83.8473, 28.9985] },
-          exports: [{ name: 'Mustang Apples', description: 'Crisp, sweet, and organic apples.', category: 'Fruit', price: 5 }]
-        },
-        {
-          name: 'Bhaktapur',
-          description: 'The city of devotees, renowned for its traditional pottery and yogurt.',
-          location: { type: 'Point', coordinates: [85.4295, 27.6710] },
-          exports: [{ name: 'Bhaktapur Pottery', description: 'Handcrafted clay pottery.', category: 'Handicraft', price: 25 }]
-        },
-        {
-          name: 'Chitwan',
-          description: 'The heart of the jungle, famous for wildlife and poultry.',
-          location: { type: 'Point', coordinates: [84.4167, 27.5833] },
-          exports: [{ name: 'Poultry', description: 'High quality poultry products.', category: 'Agriculture', price: 10 }]
-        },
-        {
-          name: 'Jhapa',
-          description: 'The granary of Nepal, major producer of rice and tea.',
-          location: { type: 'Point', coordinates: [87.9833, 26.6333] },
-          exports: [{ name: 'Betel Nut', description: 'High quality betel nuts.', category: 'Agriculture', price: 8 }]
-        }
-      ]);
+      await Region.create(getSeedRegions());
     }
 
     if (q) {

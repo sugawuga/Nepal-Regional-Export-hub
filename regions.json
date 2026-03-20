@@ -1,0 +1,772 @@
+[
+  {
+    "name": "Kathmandu",
+    "province": "Bagmati",
+    "exports": [
+      "Handicrafts",
+      "Pashmina",
+      "IT Services"
+    ],
+    "description": "Capital district with a strong mix of crafts, services, and tourism."
+  },
+  {
+    "name": "Lalitpur",
+    "province": "Bagmati",
+    "exports": [
+      "Wood Carvings",
+      "Metal Crafts",
+      "Textiles"
+    ],
+    "description": "Known for Newar art, heritage craftsmanship, and creative industries."
+  },
+  {
+    "name": "Bhaktapur",
+    "province": "Bagmati",
+    "exports": [
+      "Pottery",
+      "Juju Dhau",
+      "Wooden Masks"
+    ],
+    "description": "Heritage city famous for pottery, yogurt, and traditional artisanship."
+  },
+  {
+    "name": "Kavrepalanchok",
+    "province": "Bagmati",
+    "exports": [
+      "Tea",
+      "Dairy Products",
+      "Orange"
+    ],
+    "description": "Hill district with agriculture, dairy, and growing roadside trade."
+  },
+  {
+    "name": "Sindhupalchok",
+    "province": "Bagmati",
+    "exports": [
+      "Herbs",
+      "Stone Products",
+      "Agriculture"
+    ],
+    "description": "Mountain district known for herbs, hydropower support, and trading routes."
+  },
+  {
+    "name": "Dolakha",
+    "province": "Bagmati",
+    "exports": [
+      "Potatoes",
+      "Herbs",
+      "Tourism"
+    ],
+    "description": "Highland district with tourism, mountain agriculture, and medicinal herbs."
+  },
+  {
+    "name": "Ramechhap",
+    "province": "Bagmati",
+    "exports": [
+      "Agriculture",
+      "Oranges",
+      "Livestock"
+    ],
+    "description": "Agricultural hill district with fruit production and livestock farming."
+  },
+  {
+    "name": "Sindhuli",
+    "province": "Bagmati",
+    "exports": [
+      "Citrus Fruits",
+      "Maize",
+      "Vegetables"
+    ],
+    "description": "Fruit-growing district with a strong hill agriculture base."
+  },
+  {
+    "name": "Makwanpur",
+    "province": "Bagmati",
+    "exports": [
+      "Dairy",
+      "Vegetables",
+      "Tourism"
+    ],
+    "description": "Strategic district linking hills and plains with diversified agriculture."
+  },
+  {
+    "name": "Chitwan",
+    "province": "Bagmati",
+    "exports": [
+      "Poultry",
+      "Honey",
+      "Tourism"
+    ],
+    "description": "National park district known for poultry, honey, and eco-tourism."
+  },
+  {
+    "name": "Nuwakot",
+    "province": "Bagmati",
+    "exports": [
+      "Dairy",
+      "Vegetables",
+      "Tomatoes"
+    ],
+    "description": "Hill district with strong vegetable and dairy production."
+  },
+  {
+    "name": "Dhading",
+    "province": "Bagmati",
+    "exports": [
+      "Tomatoes",
+      "Ginger",
+      "Cattle"
+    ],
+    "description": "Agriculture-focused district with roadside trade and livestock."
+  },
+  {
+    "name": "Rasuwa",
+    "province": "Bagmati",
+    "exports": [
+      "Tourism",
+      "Herbs",
+      "Trade Services"
+    ],
+    "description": "Border district with mountain tourism and cross-border trade potential."
+  },
+  {
+    "name": "Kaski",
+    "province": "Gandaki",
+    "exports": [
+      "Tourism Services",
+      "Coffee",
+      "Handicrafts"
+    ],
+    "description": "Home to Pokhara, a major tourism hub with growing specialty coffee exports."
+  },
+  {
+    "name": "Gorkha",
+    "province": "Gandaki",
+    "exports": [
+      "Spices",
+      "Tourism",
+      "Agriculture"
+    ],
+    "description": "Historic hill district with tourism, spices, and rural agriculture."
+  },
+  {
+    "name": "Lamjung",
+    "province": "Gandaki",
+    "exports": [
+      "Coffee",
+      "Honey",
+      "Vegetables"
+    ],
+    "description": "Mid-hill district known for coffee, honey, and scenic village tourism."
+  },
+  {
+    "name": "Manang",
+    "province": "Gandaki",
+    "exports": [
+      "Tourism",
+      "Yak Products",
+      "Herbs"
+    ],
+    "description": "High-altitude district famous for trekking, yak products, and mountain herbs."
+  },
+  {
+    "name": "Mustang",
+    "province": "Gandaki",
+    "exports": [
+      "Apples",
+      "Apricots",
+      "Mountain Herbs"
+    ],
+    "description": "Famous for high-altitude organic apples and rare medicinal herbs."
+  },
+  {
+    "name": "Myagdi",
+    "province": "Gandaki",
+    "exports": [
+      "Honey",
+      "Herbs",
+      "Tourism"
+    ],
+    "description": "Mountain district with a strong herbal trade and adventure tourism."
+  },
+  {
+    "name": "Baglung",
+    "province": "Gandaki",
+    "exports": [
+      "Citrus Fruits",
+      "Vegetables",
+      "Tourism"
+    ],
+    "description": "Hill district with horticulture, agriculture, and tourism corridors."
+  },
+  {
+    "name": "Parbat",
+    "province": "Gandaki",
+    "exports": [
+      "Coffee",
+      "Vegetables",
+      "Tourism"
+    ],
+    "description": "Mid-hill district with coffee, vegetable farming, and scenic trade routes."
+  },
+  {
+    "name": "Syangja",
+    "province": "Gandaki",
+    "exports": [
+      "Oranges",
+      "Coffee",
+      "Spices"
+    ],
+    "description": "Known for citrus orchards, coffee, and mid-hill agricultural trade."
+  },
+  {
+    "name": "Tanahun",
+    "province": "Gandaki",
+    "exports": [
+      "Dairy",
+      "Vegetables",
+      "Hydropower Services"
+    ],
+    "description": "Important hill district with agriculture and service-sector growth."
+  },
+  {
+    "name": "Ilam",
+    "province": "Koshi",
+    "exports": [
+      "Orthodox Tea",
+      "Cardamom",
+      "Milk Products"
+    ],
+    "description": "The tea capital of Nepal, producing world-class Himalayan orthodox tea."
+  },
+  {
+    "name": "Jhapa",
+    "province": "Koshi",
+    "exports": [
+      "Tea",
+      "Rice",
+      "Betel Nut"
+    ],
+    "description": "Eastern agricultural district and gateway to India."
+  },
+  {
+    "name": "Morang",
+    "province": "Koshi",
+    "exports": [
+      "Jute",
+      "Sugar",
+      "Garments"
+    ],
+    "description": "One of Nepal's oldest industrial districts with diverse manufacturing."
+  },
+  {
+    "name": "Sunsari",
+    "province": "Koshi",
+    "exports": [
+      "Rice",
+      "Jute",
+      "Industrial Goods"
+    ],
+    "description": "Industrial and agricultural district with major trade links."
+  },
+  {
+    "name": "Dhankuta",
+    "province": "Koshi",
+    "exports": [
+      "Oranges",
+      "Ginger",
+      "Cardamom"
+    ],
+    "description": "Hill district known for citrus fruit and spice production."
+  },
+  {
+    "name": "Bhojpur",
+    "province": "Koshi",
+    "exports": [
+      "Tea",
+      "Allo Fiber",
+      "Agriculture"
+    ],
+    "description": "Eastern hill district with tea, fiber, and terrace farming."
+  },
+  {
+    "name": "Khotang",
+    "province": "Koshi",
+    "exports": [
+      "Coffee",
+      "Orange",
+      "Herbs"
+    ],
+    "description": "Mountain district with coffee, oranges, and herbal products."
+  },
+  {
+    "name": "Solukhumbu",
+    "province": "Koshi",
+    "exports": [
+      "Tourism",
+      "Yak Cheese",
+      "Herbs"
+    ],
+    "description": "Everest district with trekking tourism and high-altitude products."
+  },
+  {
+    "name": "Okhaldhunga",
+    "province": "Koshi",
+    "exports": [
+      "Coffee",
+      "Ginger",
+      "Agriculture"
+    ],
+    "description": "Hill district with growing coffee and spice agriculture."
+  },
+  {
+    "name": "Sankhuwasabha",
+    "province": "Koshi",
+    "exports": [
+      "Cardamom",
+      "Herbs",
+      "Tourism"
+    ],
+    "description": "Remote mountain district with cardamom and eco-tourism potential."
+  },
+  {
+    "name": "Terhathum",
+    "province": "Koshi",
+    "exports": [
+      "Tea",
+      "Oranges",
+      "Cardamom"
+    ],
+    "description": "Hill district known for tea gardens and citrus orchards."
+  },
+  {
+    "name": "Taplejung",
+    "province": "Koshi",
+    "exports": [
+      "Cardamom",
+      "Tourism",
+      "Herbs"
+    ],
+    "description": "Mountain district with large cardamom and trekking destinations."
+  },
+  {
+    "name": "Udayapur",
+    "province": "Koshi",
+    "exports": [
+      "Cement",
+      "Rice",
+      "Vegetables"
+    ],
+    "description": "Hill-plains district with agriculture and industrial manufacturing."
+  },
+  {
+    "name": "Panchthar",
+    "province": "Koshi",
+    "exports": [
+      "Tea",
+      "Cardamom",
+      "Dairy"
+    ],
+    "description": "Tea-growing hill district with spices and dairy products."
+  },
+  {
+    "name": "Dhanusha",
+    "province": "Madhesh",
+    "exports": [
+      "Rice",
+      "Mithila Art",
+      "Vegetables"
+    ],
+    "description": "Cultural and agricultural district with strong Mithila heritage."
+  },
+  {
+    "name": "Mahottari",
+    "province": "Madhesh",
+    "exports": [
+      "Rice",
+      "Sugarcane",
+      "Vegetables"
+    ],
+    "description": "Fertile Tarai district with staple crops and vegetable trade."
+  },
+  {
+    "name": "Bara",
+    "province": "Madhesh",
+    "exports": [
+      "Sugar",
+      "Oilseeds",
+      "Industrial Goods"
+    ],
+    "description": "Industrial Tarai district with sugar production and trade logistics."
+  },
+  {
+    "name": "Parsa",
+    "province": "Madhesh",
+    "exports": [
+      "Textiles",
+      "Rice",
+      "Trade Services"
+    ],
+    "description": "Border district centered on commerce, textile trade, and logistics."
+  },
+  {
+    "name": "Rautahat",
+    "province": "Madhesh",
+    "exports": [
+      "Rice",
+      "Bananas",
+      "Vegetables"
+    ],
+    "description": "Agricultural district with banana production and market gardening."
+  },
+  {
+    "name": "Saptari",
+    "province": "Madhesh",
+    "exports": [
+      "Rice",
+      "Fish",
+      "Oilseeds"
+    ],
+    "description": "Tarai district with fisheries, rice, and oilseed cultivation."
+  },
+  {
+    "name": "Siraha",
+    "province": "Madhesh",
+    "exports": [
+      "Rice",
+      "Sugarcane",
+      "Dairy"
+    ],
+    "description": "Agricultural district with sugarcane, rice, and livestock products."
+  },
+  {
+    "name": "Sarlahi",
+    "province": "Madhesh",
+    "exports": [
+      "Sugarcane",
+      "Rice",
+      "Bananas"
+    ],
+    "description": "Fertile plains district known for cash crops and food production."
+  },
+  {
+    "name": "Rupandehi",
+    "province": "Lumbini",
+    "exports": [
+      "Cement",
+      "Processed Foods",
+      "Tourism"
+    ],
+    "description": "Industrial powerhouse and home to Lumbini, the birthplace of Buddha."
+  },
+  {
+    "name": "Kapilvastu",
+    "province": "Lumbini",
+    "exports": [
+      "Rice",
+      "Sugarcane",
+      "Tourism"
+    ],
+    "description": "Historic Tarai district with agriculture and Buddhist heritage tourism."
+  },
+  {
+    "name": "Nawalparasi East",
+    "province": "Lumbini",
+    "exports": [
+      "Dairy",
+      "Vegetables",
+      "Tourism"
+    ],
+    "description": "Eastern Nawalparasi district with agriculture and lakeside tourism."
+  },
+  {
+    "name": "Nawalparasi West",
+    "province": "Lumbini",
+    "exports": [
+      "Sugar",
+      "Rice",
+      "Trade Services"
+    ],
+    "description": "Western Nawalparasi district with trade, sugar, and market agriculture."
+  },
+  {
+    "name": "Dang",
+    "province": "Lumbini",
+    "exports": [
+      "Maize",
+      "Oilseeds",
+      "Livestock"
+    ],
+    "description": "Valley district known for mixed agriculture and food production."
+  },
+  {
+    "name": "Banke",
+    "province": "Lumbini",
+    "exports": [
+      "Herbs",
+      "Leather",
+      "Essential Oils"
+    ],
+    "description": "A key trading hub in the west with significant forest-based industries."
+  },
+  {
+    "name": "Bardiya",
+    "province": "Lumbini",
+    "exports": [
+      "Rice",
+      "Honey",
+      "Tourism"
+    ],
+    "description": "Western Tarai district known for rice fields and wildlife tourism."
+  },
+  {
+    "name": "Arghakhanchi",
+    "province": "Lumbini",
+    "exports": [
+      "Ginger",
+      "Maize",
+      "Livestock"
+    ],
+    "description": "Hill district with spice cultivation and livestock production."
+  },
+  {
+    "name": "Gulmi",
+    "province": "Lumbini",
+    "exports": [
+      "Tea",
+      "Coffee",
+      "Oranges"
+    ],
+    "description": "Hill district known for tea, coffee, and citrus farming."
+  },
+  {
+    "name": "Palpa",
+    "province": "Lumbini",
+    "exports": [
+      "Coffee",
+      "Handicrafts",
+      "Tourism"
+    ],
+    "description": "Historic hill district with handicrafts, coffee, and tourism."
+  },
+  {
+    "name": "Pyuthan",
+    "province": "Lumbini",
+    "exports": [
+      "Maize",
+      "Ginger",
+      "Vegetables"
+    ],
+    "description": "Mountain-valley district with agricultural production and trade."
+  },
+  {
+    "name": "Rolpa",
+    "province": "Lumbini",
+    "exports": [
+      "Herbs",
+      "Honey",
+      "Agriculture"
+    ],
+    "description": "Remote hill district with herbs, honey, and rural agriculture."
+  },
+  {
+    "name": "Rukum East",
+    "province": "Lumbini",
+    "exports": [
+      "Herbs",
+      "Agriculture",
+      "Tourism"
+    ],
+    "description": "Eastern Rukum district with mountain agriculture and eco-tourism."
+  },
+  {
+    "name": "Surkhet",
+    "province": "Karnali",
+    "exports": [
+      "Agriculture",
+      "Vegetables",
+      "Trade Services"
+    ],
+    "description": "Provincial hub of Karnali with agriculture and services growth."
+  },
+  {
+    "name": "Dailekh",
+    "province": "Karnali",
+    "exports": [
+      "Herbs",
+      "Ginger",
+      "Agriculture"
+    ],
+    "description": "Mountain district with herbs, spices, and subsistence agriculture."
+  },
+  {
+    "name": "Jajarkot",
+    "province": "Karnali",
+    "exports": [
+      "Herbs",
+      "Agriculture",
+      "Honey"
+    ],
+    "description": "Remote district known for herbs and traditional mountain farming."
+  },
+  {
+    "name": "Salyan",
+    "province": "Karnali",
+    "exports": [
+      "Ginger",
+      "Maize",
+      "Livestock"
+    ],
+    "description": "Hill district with ginger production and mixed farming."
+  },
+  {
+    "name": "Rukum West",
+    "province": "Karnali",
+    "exports": [
+      "Herbs",
+      "Agriculture",
+      "Handicrafts"
+    ],
+    "description": "Western Rukum district with herbs and small-scale rural production."
+  },
+  {
+    "name": "Jumla",
+    "province": "Karnali",
+    "exports": [
+      "Apples",
+      "Herbs",
+      "Marshi Rice"
+    ],
+    "description": "High-altitude district famous for apples and the indigenous Marshi rice."
+  },
+  {
+    "name": "Mugu",
+    "province": "Karnali",
+    "exports": [
+      "Herbs",
+      "Tourism",
+      "Yak Products"
+    ],
+    "description": "Remote mountain district with herbs and wilderness tourism."
+  },
+  {
+    "name": "Humla",
+    "province": "Karnali",
+    "exports": [
+      "Herbs",
+      "Salt Trade",
+      "Tourism"
+    ],
+    "description": "Northern mountain district with herb collection and historic trade routes."
+  },
+  {
+    "name": "Dolpa",
+    "province": "Karnali",
+    "exports": [
+      "Herbs",
+      "Salt",
+      "Tourism"
+    ],
+    "description": "Remote trans-Himalayan district known for herbs and trekking routes."
+  },
+  {
+    "name": "Kalikot",
+    "province": "Karnali",
+    "exports": [
+      "Herbs",
+      "Maize",
+      "Agriculture"
+    ],
+    "description": "Mountain district with herbs, maize, and rugged terrace farming."
+  },
+  {
+    "name": "Kailali",
+    "province": "Sudurpashchim",
+    "exports": [
+      "Rice",
+      "Fish",
+      "Dairy"
+    ],
+    "description": "Large Tarai district with rice fields, fisheries, and dairy products."
+  },
+  {
+    "name": "Kanchanpur",
+    "province": "Sudurpashchim",
+    "exports": [
+      "Rice",
+      "Bananas",
+      "Tourism"
+    ],
+    "description": "Far-western plains district with agriculture and wildlife tourism."
+  },
+  {
+    "name": "Doti",
+    "province": "Sudurpashchim",
+    "exports": [
+      "Millets",
+      "Ginger",
+      "Herbs"
+    ],
+    "description": "Hill district known for traditional grains, ginger, and herbs."
+  },
+  {
+    "name": "Achham",
+    "province": "Sudurpashchim",
+    "exports": [
+      "Herbs",
+      "Millets",
+      "Livestock"
+    ],
+    "description": "Mountain district with medicinal herbs and resilient subsistence farming."
+  },
+  {
+    "name": "Bajura",
+    "province": "Sudurpashchim",
+    "exports": [
+      "Herbs",
+      "Millets",
+      "Livestock"
+    ],
+    "description": "Remote hill district with herbs, grains, and small livestock trade."
+  },
+  {
+    "name": "Bajhang",
+    "province": "Sudurpashchim",
+    "exports": [
+      "Herbs",
+      "Potatoes",
+      "Livestock"
+    ],
+    "description": "Mountain district with high-altitude agriculture and herb collection."
+  },
+  {
+    "name": "Darchula",
+    "province": "Sudurpashchim",
+    "exports": [
+      "Herbs",
+      "Tourism",
+      "Trade Services"
+    ],
+    "description": "Border mountain district with herbs, trekking, and cross-border trade."
+  },
+  {
+    "name": "Baitadi",
+    "province": "Sudurpashchim",
+    "exports": [
+      "Ginger",
+      "Millets",
+      "Herbs"
+    ],
+    "description": "Hill district with ginger, traditional grains, and herbal products."
+  },
+  {
+    "name": "Dadeldhura",
+    "province": "Sudurpashchim",
+    "exports": [
+      "Coffee",
+      "Oranges",
+      "Herbs"
+    ],
+    "description": "Hill district with coffee, citrus fruits, and herbal agriculture."
+  }
+]

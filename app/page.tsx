@@ -1,10 +1,20 @@
-import { eden } from '@/lib/eden';
 import NepalInteractiveMap from '@/components/NepalInteractiveMap';
 import RegionSearch from '@/components/RegionSearch';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
-  const regions = null; const error = null;
-  const regionsArray = Array.isArray(regions) ? (regions as any[]) : [];
+  let regionsArray: any[] = [];
+  let error: string | null = null;
+
+  try {
+    const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+    const res = await fetch(new URL('/api/regions', baseUrl).toString(), { cache: 'no-store' });
+    if (!res.ok) throw new Error(`Failed to fetch regions (${res.status})`);
+    regionsArray = (await res.json()) as any[];
+  } catch (err: any) {
+    error = err?.message ?? 'Failed to load regions';
+  }
 
   return (
     <div className="min-h-screen bg-[#F9F8F6] text-stone-800 font-sans selection:bg-emerald-200">

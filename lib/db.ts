@@ -37,6 +37,7 @@ const exportItemSchema = new mongoose.Schema({
 
 const regionSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  province: { type: String, required: true },
   description: { type: String, required: true },
   location: {
     type: { type: String, enum: ['Point'], required: true },

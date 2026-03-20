@@ -11,7 +11,7 @@ import {
 } from 'react-simple-maps';
 import { motion, AnimatePresence } from 'motion/react';
 import { eden } from '@/lib/eden';
-import { DISTRICT_DATA, DistrictInfo } from '@/lib/districts';
+import { DISTRICT_DATA, DistrictInfo, slugifyDistrictName } from '@/lib/districts';
 
 // Reliable GeoJSON source for Nepal (Districts and States)
 const NEPAL_GEO_URL = 'https://raw.githubusercontent.com/mesaugat/geoJSON-Nepal/master/nepal-districts.geojson';
@@ -263,11 +263,20 @@ export default function NepalInteractiveMap() {
                         provinceId = provinceId.toLowerCase().replace('province', '').trim();
                       }
 
-                      // Try to find data by district name first, then by province name/id
-                      const info = DISTRICT_DATA[districtName] || PROVINCE_FALLBACK[provinceId] || PROVINCE_FALLBACK[districtName];
-                      const fallback = info || PROVINCE_FALLBACK[provinceId] || {};
-                      
+                      // Prefer database regions as the source of truth when available
+                      const dbRegion = dbRegions.find(r => r.name.toLowerCase() === districtName.toLowerCase());
+
+                      // Fallback to static data when DB is missing a region
+                      const staticInfo = DISTRICT_DATA[districtName] || PROVINCE_FALLBACK[provinceId] || PROVINCE_FALLBACK[districtName];
+                      const fallback = staticInfo || PROVINCE_FALLBACK[provinceId] || {};
                       const finalProvinceName = fallback.province || (provinceId && PROVINCE_FALLBACK[provinceId]?.province) || `Province ${provinceId || 'Unknown'}`;
+
+                      const info = dbRegion ? {
+                        name: dbRegion.name,
+                        province: dbRegion.province || finalProvinceName,
+                        exports: dbRegion.exports.map((e: any) => e.name),
+                        description: dbRegion.description,
+                      } : staticInfo;
 
                       return (
                         <Geography
@@ -285,7 +294,7 @@ export default function NepalInteractiveMap() {
                           }}
                           onMouseLeave={() => setHoveredDistrict(null)}
                           onClick={() => {
-                            router.push(`/region/${districtName.toLowerCase()}`);
+                            router.push(`/region/${slugifyDistrictName(districtName)}`);
                           }}
                           style={{
                             default: {
@@ -320,14 +329,14 @@ export default function NepalInteractiveMap() {
                     onMouseEnter={() => {
                       setHoveredDistrict({
                         name: region.name,
-                        province: "Verified Hub",
+                        province: region.province || "Verified Hub",
                         exports: region.exports.map((e: any) => e.name),
                         description: region.description
                       });
                     }}
                     onMouseLeave={() => setHoveredDistrict(null)}
                     onClick={() => {
-                      router.push(`/region/${region.name.toLowerCase()}`);
+                      router.push(`/region/${slugifyDistrictName(region.name)}`);
                     }}
                   >
                     <motion.circle
@@ -340,14 +349,16 @@ export default function NepalInteractiveMap() {
                       whileHover={{ scale: 1.5 }}
                       className="cursor-pointer shadow-lg"
                     />
-                    <text
-                      textAnchor="middle"
-                      y={-15}
-                      className="text-[10px] font-bold fill-stone-700 pointer-events-none"
-                      style={{ fontFamily: "Inter, sans-serif" }}
-                    >
-                      {region.name}
-                    </text>
+                    {hoveredDistrict?.name === region.name && (
+                      <text
+                        textAnchor="middle"
+                        y={-15}
+                        className="text-[10px] font-bold fill-stone-700 pointer-events-none"
+                        style={{ fontFamily: "Inter, sans-serif" }}
+                      >
+                        {region.name}
+                      </text>
+                    )}
                   </Marker>
                 ))}
               </ZoomableGroup>
