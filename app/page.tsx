@@ -1,5 +1,6 @@
 import NepalInteractiveMap from '@/components/NepalInteractiveMap';
 import RegionSearch from '@/components/RegionSearch';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,6 +34,20 @@ export default async function Home() {
         <p className="text-xl text-stone-500 max-w-2xl mx-auto mb-12 leading-relaxed">
           Discover authentic local produce, handicrafts, and raw materials directly from the source. Geospatially verified and globally available.
         </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link
+            href="/exports"
+            className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-stone-900 text-white font-semibold hover:bg-stone-800 transition-colors shadow-lg"
+          >
+            Browse Exports
+          </Link>
+          <a
+            href="#regions"
+            className="inline-flex items-center justify-center px-8 py-4 rounded-full border border-stone-300 bg-white text-stone-700 font-semibold hover:border-emerald-300 hover:text-emerald-700 transition-colors shadow-sm"
+          >
+            Explore Regions
+          </a>
+        </div>
       </section>
 
       {/* Interactive Map Section */}
@@ -41,7 +56,7 @@ export default async function Home() {
       </section>
 
       {/* Search and Regions Section */}
-      <section className="py-20">
+      <section id="regions" className="py-20">
         {error ? (
           <div className="max-w-4xl mx-auto px-6">
             <div className="p-6 bg-red-50 text-red-600 rounded-3xl border border-red-100 text-center">
