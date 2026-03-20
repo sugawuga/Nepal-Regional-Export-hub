@@ -7,7 +7,11 @@
       "Pashmina",
       "IT Services"
     ],
-    "description": "Capital district with a strong mix of crafts, services, and tourism."
+    "description": "Capital district with a strong mix of crafts, services, and tourism.",
+    "coordinates": [
+      85.337489,
+      27.724649
+    ]
   },
   {
     "name": "Lalitpur",
@@ -17,7 +21,11 @@
       "Metal Crafts",
       "Textiles"
     ],
-    "description": "Known for Newar art, heritage craftsmanship, and creative industries."
+    "description": "Known for Newar art, heritage craftsmanship, and creative industries.",
+    "coordinates": [
+      85.344026,
+      27.538746
+    ]
   },
   {
     "name": "Bhaktapur",
@@ -27,7 +35,11 @@
       "Juju Dhau",
       "Wooden Masks"
     ],
-    "description": "Heritage city famous for pottery, yogurt, and traditional artisanship."
+    "description": "Heritage city famous for pottery, yogurt, and traditional artisanship.",
+    "coordinates": [
+      85.445306,
+      27.679501
+    ]
   },
   {
     "name": "KAVRE",
@@ -37,7 +49,11 @@
       "Dairy Products",
       "Orange"
     ],
-    "description": "Hill district with agriculture, dairy, and growing roadside trade."
+    "description": "Hill district with agriculture, dairy, and growing roadside trade.",
+    "coordinates": [
+      85.621155,
+      27.538843
+    ]
   },
   {
     "name": "Sindhupalchok",
@@ -47,7 +63,11 @@
       "Stone Products",
       "Agriculture"
     ],
-    "description": "Mountain district known for herbs, hydropower support, and trading routes."
+    "description": "Mountain district known for herbs, hydropower support, and trading routes.",
+    "coordinates": [
+      85.740707,
+      27.913454
+    ]
   },
   {
     "name": "Dolakha",
@@ -57,7 +77,11 @@
       "Herbs",
       "Tourism"
     ],
-    "description": "Highland district with tourism, mountain agriculture, and medicinal herbs."
+    "description": "Highland district with tourism, mountain agriculture, and medicinal herbs.",
+    "coordinates": [
+      86.197707,
+      27.783338
+    ]
   },
   {
     "name": "Ramechhap",
@@ -67,7 +91,11 @@
       "Oranges",
       "Livestock"
     ],
-    "description": "Agricultural hill district with fruit production and livestock farming."
+    "description": "Agricultural hill district with fruit production and livestock farming.",
+    "coordinates": [
+      86.17327,
+      27.507832
+    ]
   },
   {
     "name": "Sindhuli",
@@ -77,7 +105,11 @@
       "Maize",
       "Vegetables"
     ],
-    "description": "Fruit-growing district with a strong hill agriculture base."
+    "description": "Fruit-growing district with a strong hill agriculture base.",
+    "coordinates": [
+      85.946918,
+      27.201531
+    ]
   },
   {
     "name": "Makwanpur",
@@ -87,7 +119,11 @@
       "Vegetables",
       "Tourism"
     ],
-    "description": "Strategic district linking hills and plains with diversified agriculture."
+    "description": "Strategic district linking hills and plains with diversified agriculture.",
+    "coordinates": [
+      85.082636,
+      27.469564
+    ]
   },
   {
     "name": "Chitwan",
@@ -97,7 +133,11 @@
       "Honey",
       "Tourism"
     ],
-    "description": "National park district known for poultry, honey, and eco-tourism."
+    "description": "National park district known for poultry, honey, and eco-tourism.",
+    "coordinates": [
+      84.438944,
+      27.585124
+    ]
   },
   {
     "name": "Nuwakot",
@@ -107,7 +147,11 @@
       "Vegetables",
       "Tomatoes"
     ],
-    "description": "Hill district with strong vegetable and dairy production."
+    "description": "Hill district with strong vegetable and dairy production.",
+    "coordinates": [
+      85.239009,
+      27.914081
+    ]
   },
   {
     "name": "Dhading",
@@ -117,7 +161,11 @@
       "Ginger",
       "Cattle"
     ],
-    "description": "Agriculture-focused district with roadside trade and livestock."
+    "description": "Agriculture-focused district with roadside trade and livestock.",
+    "coordinates": [
+      84.964713,
+      27.950165
+    ]
   },
   {
     "name": "Rasuwa",
@@ -127,7 +175,11 @@
       "Herbs",
       "Trade Services"
     ],
-    "description": "Border district with mountain tourism and cross-border trade potential."
+    "description": "Border district with mountain tourism and cross-border trade potential.",
+    "coordinates": [
+      85.413741,
+      28.18273
+    ]
   },
   {
     "name": "Kaski",
@@ -137,7 +189,11 @@
       "Coffee",
       "Handicrafts"
     ],
-    "description": "Home to Pokhara, a major tourism hub with growing specialty coffee exports."
+    "description": "Home to Pokhara, a major tourism hub with growing specialty coffee exports.",
+    "coordinates": [
+      84.00121,
+      28.354439
+    ]
   },
   {
     "name": "Gorkha",
@@ -147,7 +203,11 @@
       "Tourism",
       "Agriculture"
     ],
-    "description": "Historic hill district with tourism, spices, and rural agriculture."
+    "description": "Historic hill district with tourism, spices, and rural agriculture.",
+    "coordinates": [
+      84.79326,
+      28.318886
+    ]
   },
   {
     "name": "Lamjung",
@@ -157,7 +217,11 @@
       "Honey",
       "Vegetables"
     ],
-    "description": "Mid-hill district known for coffee, honey, and scenic village tourism."
+    "description": "Mid-hill district known for coffee, honey, and scenic village tourism.",
+    "coordinates": [
+      84.432948,
+      28.291752
+    ]
   },
   {
     "name": "Manang",
@@ -167,7 +231,11 @@
       "Yak Products",
       "Herbs"
     ],
-    "description": "High-altitude district famous for trekking, yak products, and mountain herbs."
+    "description": "High-altitude district famous for trekking, yak products, and mountain herbs.",
+    "coordinates": [
+      84.227148,
+      28.67505
+    ]
   },
   {
     "name": "Mustang",
@@ -177,7 +245,11 @@
       "Apricots",
       "Mountain Herbs"
     ],
-    "description": "Famous for high-altitude organic apples and rare medicinal herbs."
+    "description": "Famous for high-altitude organic apples and rare medicinal herbs.",
+    "coordinates": [
+      83.860421,
+      28.981809
+    ]
   },
   {
     "name": "Myagdi",
@@ -187,7 +259,11 @@
       "Herbs",
       "Tourism"
     ],
-    "description": "Mountain district with a strong herbal trade and adventure tourism."
+    "description": "Mountain district with a strong herbal trade and adventure tourism.",
+    "coordinates": [
+      83.463313,
+      28.553421
+    ]
   },
   {
     "name": "Baglung",
@@ -197,7 +273,11 @@
       "Vegetables",
       "Tourism"
     ],
-    "description": "Hill district with horticulture, agriculture, and tourism corridors."
+    "description": "Hill district with horticulture, agriculture, and tourism corridors.",
+    "coordinates": [
+      83.256946,
+      28.345708
+    ]
   },
   {
     "name": "Parbat",
@@ -207,7 +287,11 @@
       "Vegetables",
       "Tourism"
     ],
-    "description": "Mid-hill district with coffee, vegetable farming, and scenic trade routes."
+    "description": "Mid-hill district with coffee, vegetable farming, and scenic trade routes.",
+    "coordinates": [
+      83.68316,
+      28.209235
+    ]
   },
   {
     "name": "Syangja",
@@ -217,7 +301,11 @@
       "Coffee",
       "Spices"
     ],
-    "description": "Known for citrus orchards, coffee, and mid-hill agricultural trade."
+    "description": "Known for citrus orchards, coffee, and mid-hill agricultural trade.",
+    "coordinates": [
+      83.807104,
+      28.020904
+    ]
   },
   {
     "name": "TANAHU",
@@ -227,7 +315,11 @@
       "Vegetables",
       "Hydropower Services"
     ],
-    "description": "Important hill district with agriculture and service-sector growth."
+    "description": "Important hill district with agriculture and service-sector growth.",
+    "coordinates": [
+      84.255847,
+      27.955249
+    ]
   },
   {
     "name": "Ilam",
@@ -237,7 +329,11 @@
       "Cardamom",
       "Milk Products"
     ],
-    "description": "The tea capital of Nepal, producing world-class Himalayan orthodox tea."
+    "description": "The tea capital of Nepal, producing world-class Himalayan orthodox tea.",
+    "coordinates": [
+      87.907343,
+      26.87893
+    ]
   },
   {
     "name": "Jhapa",
@@ -247,7 +343,11 @@
       "Rice",
       "Betel Nut"
     ],
-    "description": "Eastern agricultural district and gateway to India."
+    "description": "Eastern agricultural district and gateway to India.",
+    "coordinates": [
+      87.916662,
+      26.579754
+    ]
   },
   {
     "name": "Morang",
@@ -257,7 +357,11 @@
       "Sugar",
       "Garments"
     ],
-    "description": "One of Nepal's oldest industrial districts with diverse manufacturing."
+    "description": "One of Nepal's oldest industrial districts with diverse manufacturing.",
+    "coordinates": [
+      87.475552,
+      26.617113
+    ]
   },
   {
     "name": "Sunsari",
@@ -267,7 +371,11 @@
       "Jute",
       "Industrial Goods"
     ],
-    "description": "Industrial and agricultural district with major trade links."
+    "description": "Industrial and agricultural district with major trade links.",
+    "coordinates": [
+      87.168016,
+      26.650093
+    ]
   },
   {
     "name": "Dhankuta",
@@ -277,7 +385,11 @@
       "Ginger",
       "Cardamom"
     ],
-    "description": "Hill district known for citrus fruit and spice production."
+    "description": "Hill district known for citrus fruit and spice production.",
+    "coordinates": [
+      87.334293,
+      26.990648
+    ]
   },
   {
     "name": "Bhojpur",
@@ -287,7 +399,11 @@
       "Allo Fiber",
       "Agriculture"
     ],
-    "description": "Eastern hill district with tea, fiber, and terrace farming."
+    "description": "Eastern hill district with tea, fiber, and terrace farming.",
+    "coordinates": [
+      87.071137,
+      27.180122
+    ]
   },
   {
     "name": "Khotang",
@@ -297,7 +413,11 @@
       "Orange",
       "Herbs"
     ],
-    "description": "Mountain district with coffee, oranges, and herbal products."
+    "description": "Mountain district with coffee, oranges, and herbal products.",
+    "coordinates": [
+      86.790441,
+      27.169314
+    ]
   },
   {
     "name": "Solukhumbu",
@@ -307,7 +427,11 @@
       "Yak Cheese",
       "Herbs"
     ],
-    "description": "Everest district with trekking tourism and high-altitude products."
+    "description": "Everest district with trekking tourism and high-altitude products.",
+    "coordinates": [
+      86.720358,
+      27.712016
+    ]
   },
   {
     "name": "Okhaldhunga",
@@ -317,7 +441,11 @@
       "Ginger",
       "Agriculture"
     ],
-    "description": "Hill district with growing coffee and spice agriculture."
+    "description": "Hill district with growing coffee and spice agriculture.",
+    "coordinates": [
+      86.422095,
+      27.331376
+    ]
   },
   {
     "name": "Sankhuwasabha",
@@ -327,7 +455,11 @@
       "Herbs",
       "Tourism"
     ],
-    "description": "Remote mountain district with cardamom and eco-tourism potential."
+    "description": "Remote mountain district with cardamom and eco-tourism potential.",
+    "coordinates": [
+      87.281233,
+      27.581955
+    ]
   },
   {
     "name": "TEHRATHUM",
@@ -337,7 +469,11 @@
       "Oranges",
       "Cardamom"
     ],
-    "description": "Hill district known for tea gardens and citrus orchards."
+    "description": "Hill district known for tea gardens and citrus orchards.",
+    "coordinates": [
+      87.550425,
+      27.153315
+    ]
   },
   {
     "name": "Taplejung",
@@ -347,7 +483,11 @@
       "Tourism",
       "Herbs"
     ],
-    "description": "Mountain district with large cardamom and trekking destinations."
+    "description": "Mountain district with large cardamom and trekking destinations.",
+    "coordinates": [
+      87.823692,
+      27.581251
+    ]
   },
   {
     "name": "Udayapur",
@@ -357,7 +497,11 @@
       "Rice",
       "Vegetables"
     ],
-    "description": "Hill-plains district with agriculture and industrial manufacturing."
+    "description": "Hill-plains district with agriculture and industrial manufacturing.",
+    "coordinates": [
+      86.700274,
+      26.912929
+    ]
   },
   {
     "name": "Panchthar",
@@ -367,7 +511,11 @@
       "Cardamom",
       "Dairy"
     ],
-    "description": "Tea-growing hill district with spices and dairy products."
+    "description": "Tea-growing hill district with spices and dairy products.",
+    "coordinates": [
+      87.777925,
+      27.115025
+    ]
   },
   {
     "name": "DHANUSA",
@@ -377,7 +525,11 @@
       "Mithila Art",
       "Vegetables"
     ],
-    "description": "Cultural and agricultural district with strong Mithila heritage."
+    "description": "Cultural and agricultural district with strong Mithila heritage.",
+    "coordinates": [
+      86.036484,
+      26.82885
+    ]
   },
   {
     "name": "Mahottari",
@@ -387,7 +539,11 @@
       "Sugarcane",
       "Vegetables"
     ],
-    "description": "Fertile Tarai district with staple crops and vegetable trade."
+    "description": "Fertile Tarai district with staple crops and vegetable trade.",
+    "coordinates": [
+      85.822533,
+      26.882813
+    ]
   },
   {
     "name": "Bara",
@@ -397,7 +553,11 @@
       "Oilseeds",
       "Industrial Goods"
     ],
-    "description": "Industrial Tarai district with sugar production and trade logistics."
+    "description": "Industrial Tarai district with sugar production and trade logistics.",
+    "coordinates": [
+      85.07366,
+      27.109224
+    ]
   },
   {
     "name": "Parsa",
@@ -407,7 +567,11 @@
       "Rice",
       "Trade Services"
     ],
-    "description": "Border district centered on commerce, textile trade, and logistics."
+    "description": "Border district centered on commerce, textile trade, and logistics.",
+    "coordinates": [
+      84.78313,
+      27.239141
+    ]
   },
   {
     "name": "Rautahat",
@@ -417,7 +581,11 @@
       "Bananas",
       "Vegetables"
     ],
-    "description": "Agricultural district with banana production and market gardening."
+    "description": "Agricultural district with banana production and market gardening.",
+    "coordinates": [
+      85.305444,
+      27.001728
+    ]
   },
   {
     "name": "Saptari",
@@ -427,7 +595,11 @@
       "Fish",
       "Oilseeds"
     ],
-    "description": "Tarai district with fisheries, rice, and oilseed cultivation."
+    "description": "Tarai district with fisheries, rice, and oilseed cultivation.",
+    "coordinates": [
+      86.728274,
+      26.615944
+    ]
   },
   {
     "name": "Siraha",
@@ -437,7 +609,11 @@
       "Sugarcane",
       "Dairy"
     ],
-    "description": "Agricultural district with sugarcane, rice, and livestock products."
+    "description": "Agricultural district with sugarcane, rice, and livestock products.",
+    "coordinates": [
+      86.343251,
+      26.756632
+    ]
   },
   {
     "name": "Sarlahi",
@@ -447,7 +623,11 @@
       "Rice",
       "Bananas"
     ],
-    "description": "Fertile plains district known for cash crops and food production."
+    "description": "Fertile plains district known for cash crops and food production.",
+    "coordinates": [
+      85.566679,
+      26.984725
+    ]
   },
   {
     "name": "Rupandehi",
@@ -457,7 +637,11 @@
       "Processed Foods",
       "Tourism"
     ],
-    "description": "Industrial powerhouse and home to Lumbini, the birthplace of Buddha."
+    "description": "Industrial powerhouse and home to Lumbini, the birthplace of Buddha.",
+    "coordinates": [
+      83.392331,
+      27.581488
+    ]
   },
   {
     "name": "KAPILBASTU",
@@ -467,7 +651,11 @@
       "Sugarcane",
       "Tourism"
     ],
-    "description": "Historic Tarai district with agriculture and Buddhist heritage tourism."
+    "description": "Historic Tarai district with agriculture and Buddhist heritage tourism.",
+    "coordinates": [
+      82.992582,
+      27.635787
+    ]
   },
   {
     "name": "Nawalparasi",
@@ -480,7 +668,11 @@
       "Rice",
       "Trade Services"
     ],
-    "description": "Combined Nawalparasi district with agriculture, trade, and lakeside tourism."
+    "description": "Combined Nawalparasi district with agriculture, trade, and lakeside tourism.",
+    "coordinates": [
+      83.955074,
+      27.633219
+    ]
   },
   {
     "name": "Dang",
@@ -490,7 +682,11 @@
       "Oilseeds",
       "Livestock"
     ],
-    "description": "Valley district known for mixed agriculture and food production."
+    "description": "Valley district known for mixed agriculture and food production.",
+    "coordinates": [
+      82.420734,
+      27.962565
+    ]
   },
   {
     "name": "Banke",
@@ -500,7 +696,11 @@
       "Leather",
       "Essential Oils"
     ],
-    "description": "A key trading hub in the west with significant forest-based industries."
+    "description": "A key trading hub in the west with significant forest-based industries.",
+    "coordinates": [
+      81.830628,
+      28.08603
+    ]
   },
   {
     "name": "Bardiya",
@@ -510,7 +710,11 @@
       "Honey",
       "Tourism"
     ],
-    "description": "Western Tarai district known for rice fields and wildlife tourism."
+    "description": "Western Tarai district known for rice fields and wildlife tourism.",
+    "coordinates": [
+      81.402322,
+      28.384169
+    ]
   },
   {
     "name": "Arghakhanchi",
@@ -520,7 +724,11 @@
       "Maize",
       "Livestock"
     ],
-    "description": "Hill district with spice cultivation and livestock production."
+    "description": "Hill district with spice cultivation and livestock production.",
+    "coordinates": [
+      83.076399,
+      27.918393
+    ]
   },
   {
     "name": "Gulmi",
@@ -530,7 +738,11 @@
       "Coffee",
       "Oranges"
     ],
-    "description": "Hill district known for tea, coffee, and citrus farming."
+    "description": "Hill district known for tea, coffee, and citrus farming.",
+    "coordinates": [
+      83.305261,
+      28.09347
+    ]
   },
   {
     "name": "Palpa",
@@ -540,7 +752,11 @@
       "Handicrafts",
       "Tourism"
     ],
-    "description": "Historic hill district with handicrafts, coffee, and tourism."
+    "description": "Historic hill district with handicrafts, coffee, and tourism.",
+    "coordinates": [
+      83.628353,
+      27.818804
+    ]
   },
   {
     "name": "Pyuthan",
@@ -550,7 +766,11 @@
       "Ginger",
       "Vegetables"
     ],
-    "description": "Mountain-valley district with agricultural production and trade."
+    "description": "Mountain-valley district with agricultural production and trade.",
+    "coordinates": [
+      82.869152,
+      28.118303
+    ]
   },
   {
     "name": "Rolpa",
@@ -560,7 +780,11 @@
       "Honey",
       "Agriculture"
     ],
-    "description": "Remote hill district with herbs, honey, and rural agriculture."
+    "description": "Remote hill district with herbs, honey, and rural agriculture.",
+    "coordinates": [
+      82.628013,
+      28.343068
+    ]
   },
   {
     "name": "Rukum",
@@ -571,7 +795,11 @@
       "Tourism",
       "Handicrafts"
     ],
-    "description": "Combined Rukum district with mountain agriculture, tourism, and small-scale handicrafts."
+    "description": "Combined Rukum district with mountain agriculture, tourism, and small-scale handicrafts.",
+    "coordinates": [
+      82.665824,
+      28.700483
+    ]
   },
   {
     "name": "Surkhet",
@@ -581,7 +809,11 @@
       "Vegetables",
       "Trade Services"
     ],
-    "description": "Provincial hub of Karnali with agriculture and services growth."
+    "description": "Provincial hub of Karnali with agriculture and services growth.",
+    "coordinates": [
+      81.589367,
+      28.638055
+    ]
   },
   {
     "name": "Dailekh",
@@ -591,7 +823,11 @@
       "Ginger",
       "Agriculture"
     ],
-    "description": "Mountain district with herbs, spices, and subsistence agriculture."
+    "description": "Mountain district with herbs, spices, and subsistence agriculture.",
+    "coordinates": [
+      81.678327,
+      28.876965
+    ]
   },
   {
     "name": "Jajarkot",
@@ -601,7 +837,11 @@
       "Agriculture",
       "Honey"
     ],
-    "description": "Remote district known for herbs and traditional mountain farming."
+    "description": "Remote district known for herbs and traditional mountain farming.",
+    "coordinates": [
+      82.168453,
+      28.864512
+    ]
   },
   {
     "name": "Salyan",
@@ -611,7 +851,11 @@
       "Maize",
       "Livestock"
     ],
-    "description": "Hill district with ginger production and mixed farming."
+    "description": "Hill district with ginger production and mixed farming.",
+    "coordinates": [
+      82.139871,
+      28.397304
+    ]
   },
   {
     "name": "Jumla",
@@ -621,7 +865,11 @@
       "Herbs",
       "Marshi Rice"
     ],
-    "description": "High-altitude district famous for apples and the indigenous Marshi rice."
+    "description": "High-altitude district famous for apples and the indigenous Marshi rice.",
+    "coordinates": [
+      82.219501,
+      29.271306
+    ]
   },
   {
     "name": "Mugu",
@@ -631,7 +879,11 @@
       "Tourism",
       "Yak Products"
     ],
-    "description": "Remote mountain district with herbs and wilderness tourism."
+    "description": "Remote mountain district with herbs and wilderness tourism.",
+    "coordinates": [
+      82.372498,
+      29.616761
+    ]
   },
   {
     "name": "Humla",
@@ -641,7 +893,11 @@
       "Salt Trade",
       "Tourism"
     ],
-    "description": "Northern mountain district with herb collection and historic trade routes."
+    "description": "Northern mountain district with herb collection and historic trade routes.",
+    "coordinates": [
+      81.883043,
+      30.031115
+    ]
   },
   {
     "name": "Dolpa",
@@ -651,7 +907,11 @@
       "Salt",
       "Tourism"
     ],
-    "description": "Remote trans-Himalayan district known for herbs and trekking routes."
+    "description": "Remote trans-Himalayan district known for herbs and trekking routes.",
+    "coordinates": [
+      83.054598,
+      29.169322
+    ]
   },
   {
     "name": "Kalikot",
@@ -661,7 +921,11 @@
       "Maize",
       "Agriculture"
     ],
-    "description": "Mountain district with herbs, maize, and rugged terrace farming."
+    "description": "Mountain district with herbs, maize, and rugged terrace farming.",
+    "coordinates": [
+      81.753889,
+      29.193605
+    ]
   },
   {
     "name": "Kailali",
@@ -671,7 +935,11 @@
       "Fish",
       "Dairy"
     ],
-    "description": "Large Tarai district with rice fields, fisheries, and dairy products."
+    "description": "Large Tarai district with rice fields, fisheries, and dairy products.",
+    "coordinates": [
+      80.878567,
+      28.743287
+    ]
   },
   {
     "name": "Kanchanpur",
@@ -681,7 +949,11 @@
       "Bananas",
       "Tourism"
     ],
-    "description": "Far-western plains district with agriculture and wildlife tourism."
+    "description": "Far-western plains district with agriculture and wildlife tourism.",
+    "coordinates": [
+      80.324419,
+      28.862551
+    ]
   },
   {
     "name": "Doti",
@@ -691,7 +963,11 @@
       "Ginger",
       "Herbs"
     ],
-    "description": "Hill district known for traditional grains, ginger, and herbs."
+    "description": "Hill district known for traditional grains, ginger, and herbs.",
+    "coordinates": [
+      80.896998,
+      29.168252
+    ]
   },
   {
     "name": "Achham",
@@ -701,7 +977,11 @@
       "Millets",
       "Livestock"
     ],
-    "description": "Mountain district with medicinal herbs and resilient subsistence farming."
+    "description": "Mountain district with medicinal herbs and resilient subsistence farming.",
+    "coordinates": [
+      81.299613,
+      29.11305
+    ]
   },
   {
     "name": "Bajura",
@@ -711,7 +991,11 @@
       "Millets",
       "Livestock"
     ],
-    "description": "Remote hill district with herbs, grains, and small livestock trade."
+    "description": "Remote hill district with herbs, grains, and small livestock trade.",
+    "coordinates": [
+      81.566079,
+      29.560671
+    ]
   },
   {
     "name": "Bajhang",
@@ -721,7 +1005,11 @@
       "Potatoes",
       "Livestock"
     ],
-    "description": "Mountain district with high-altitude agriculture and herb collection."
+    "description": "Mountain district with high-altitude agriculture and herb collection.",
+    "coordinates": [
+      81.179789,
+      29.706981
+    ]
   },
   {
     "name": "Darchula",
@@ -731,7 +1019,11 @@
       "Tourism",
       "Trade Services"
     ],
-    "description": "Border mountain district with herbs, trekking, and cross-border trade."
+    "description": "Border mountain district with herbs, trekking, and cross-border trade.",
+    "coordinates": [
+      80.794176,
+      29.891641
+    ]
   },
   {
     "name": "Baitadi",
@@ -741,7 +1033,11 @@
       "Millets",
       "Herbs"
     ],
-    "description": "Hill district with ginger, traditional grains, and herbal products."
+    "description": "Hill district with ginger, traditional grains, and herbal products.",
+    "coordinates": [
+      80.571256,
+      29.505704
+    ]
   },
   {
     "name": "Dadeldhura",
@@ -751,6 +1047,10 @@
       "Oranges",
       "Herbs"
     ],
-    "description": "Hill district with coffee, citrus fruits, and herbal agriculture."
+    "description": "Hill district with coffee, citrus fruits, and herbal agriculture.",
+    "coordinates": [
+      80.488159,
+      29.223471
+    ]
   }
 ]

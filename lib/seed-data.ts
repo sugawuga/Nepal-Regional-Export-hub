@@ -4,6 +4,8 @@ export type RegionSeed = {
   name: string;
   province: string;
   description: string;
+  is_verified: boolean;
+  coordinates?: [number, number];
   location: { type: 'Point'; coordinates: [number, number] };
   exports: { name: string; description: string; category: string; price: number }[];
 };
@@ -39,32 +41,21 @@ const DISTRICT_SEEDS = regionsData as Array<{
   province: string;
   exports: string[];
   description: string;
+  coordinates?: [number, number];
 }>;
-
-// Provide some approximate coordinates for the districts in regions.json.
-// If we don’t know them, fall back to the Nepal center point.
-const COORDINATES: Record<string, [number, number]> = {
-  Kathmandu: [85.3240, 27.7172],
-  Kaski: [83.9856, 28.2096],
-  Ilam: [87.9167, 26.9167],
-  Mustang: [83.9180, 28.9985],
-  Rupandehi: [83.4500, 27.5000],
-  Jhapa: [87.8667, 26.6667],
-  Chitwan: [84.3542, 27.5417],
-  Banke: [81.6167, 28.1000],
-  Morang: [87.5000, 26.6667],
-};
 
 export function getSeedRegions(): RegionSeed[] {
   return DISTRICT_SEEDS.map((info) => {
     const name = info.name;
-    const coords = COORDINATES[name] || DEFAULT_COORDINATES;
+    const coords = info.coordinates || DEFAULT_COORDINATES;
     const exportsList = (info.exports || []).map(normalizeExport);
 
     return {
       name,
       province: info.province,
       description: info.description,
+      is_verified: false,
+      coordinates: coords,
       location: { type: 'Point', coordinates: coords },
       exports: exportsList,
     };

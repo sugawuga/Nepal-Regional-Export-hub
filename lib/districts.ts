@@ -5,6 +5,7 @@ export interface DistrictInfo {
   province: string;
   exports: string[];
   description: string;
+  coordinates?: [number, number];
   municipalities?: string[];
   livePois?: { name: string; type: string }[];
 }

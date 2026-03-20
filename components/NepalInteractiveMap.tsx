@@ -322,14 +322,14 @@ export default function NepalInteractiveMap() {
                   }
                 </Geographies>
 
-                {dbRegions.map((region) => (
+                {dbRegions.filter((region) => region.is_verified !== false).map((region) => (
                   <Marker 
                     key={region._id} 
                     coordinates={region.location.coordinates}
                     onMouseEnter={() => {
                       setHoveredDistrict({
                         name: region.name,
-                        province: region.province || "Verified Hub",
+                        province: region.is_verified ? (region.province || "Verified Hub") : (region.province || "Unverified"),
                         exports: region.exports.map((e: any) => e.name),
                         description: region.description
                       });

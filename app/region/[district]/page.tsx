@@ -61,7 +61,7 @@ export default async function RegionPage({ params }: PageProps) {
     }))
   };
 
-  const isVerified = !!dbRegion;
+  const isVerified = !!(dbRegion as any)?.is_verified;
 
   return (
     <div className="min-h-screen bg-[#F9F8F6] text-stone-800 font-sans selection:bg-emerald-200">

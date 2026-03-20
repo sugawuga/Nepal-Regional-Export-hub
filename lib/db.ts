@@ -39,6 +39,7 @@ const regionSchema = new mongoose.Schema({
   name: { type: String, required: true },
   province: { type: String, required: true },
   description: { type: String, required: true },
+  is_verified: { type: Boolean, default: false },
   location: {
     type: { type: String, enum: ['Point'], required: true },
     coordinates: { type: [Number], required: true }, // [longitude, latitude]
