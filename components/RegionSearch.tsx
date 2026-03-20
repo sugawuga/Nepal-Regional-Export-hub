@@ -11,6 +11,7 @@ interface Region {
   name: string;
   description: string;
   exports: { name: string }[];
+  is_verified?: boolean;
 }
 
 interface RegionSearchProps {
@@ -24,6 +25,9 @@ export default function RegionSearch({ initialRegions }: RegionSearchProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const visibleRegions = searchQuery.trim()
+    ? regions
+    : regions.filter((region) => region.is_verified);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -195,12 +199,12 @@ export default function RegionSearch({ initialRegions }: RegionSearchProps) {
         <div className="space-y-6 max-w-4xl mx-auto">
           <div className="flex items-center justify-center gap-4 mb-8">
             <h3 className="text-3xl font-bold text-center">
-              {searchQuery ? `Search Results (${regions.length})` : 'Featured Regions'}
+              {searchQuery ? `Search Results (${visibleRegions.length})` : 'Featured Regions'}
             </h3>
             {isSearching && <Loader2 className="animate-spin text-emerald-600" size={24} />}
           </div>
           
-          {regions.length === 0 ? (
+          {visibleRegions.length === 0 ? (
             <div className="text-center py-20 bg-stone-50 rounded-3xl border-2 border-dashed border-stone-200">
               <p className="text-stone-400 text-lg">No regions found matching &quot;{searchQuery}&quot;</p>
               <button 
@@ -215,7 +219,7 @@ export default function RegionSearch({ initialRegions }: RegionSearchProps) {
               </button>
             </div>
           ) : (
-            regions.map((region) => (
+            visibleRegions.map((region) => (
               <Link href={`/region/${slugifyDistrictName(region.name)}`} key={region._id}>
                 <div className="group bg-white p-8 rounded-3xl border border-stone-200 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-900/5 transition-all cursor-pointer mb-6">
                   <div className="flex justify-between items-start mb-4">

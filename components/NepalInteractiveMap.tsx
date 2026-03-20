@@ -292,7 +292,6 @@ export default function NepalInteractiveMap() {
                             setHoveredDistrict(newInfo);
                             fetchDistrictDetails(districtName, newInfo.province);
                           }}
-                          onMouseLeave={() => setHoveredDistrict(null)}
                           onClick={() => {
                             router.push(`/region/${slugifyDistrictName(districtName)}`);
                           }}
@@ -334,7 +333,6 @@ export default function NepalInteractiveMap() {
                         description: region.description
                       });
                     }}
-                    onMouseLeave={() => setHoveredDistrict(null)}
                     onClick={() => {
                       router.push(`/region/${slugifyDistrictName(region.name)}`);
                     }}
@@ -463,15 +461,16 @@ export default function NepalInteractiveMap() {
                 </div>
               )}
 
-              <div className="mt-12 pt-8 border-t border-stone-800/50 flex items-center justify-between">
-                <div className="flex -space-x-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="w-10 h-10 rounded-full border-4 border-stone-900 bg-stone-800 flex items-center justify-center text-xs font-black text-stone-500">
-                      {i}
-                    </div>
-                  ))}
-                </div>
-                <button className="group text-emerald-400 text-sm font-black hover:text-emerald-300 transition-all flex items-center gap-3 uppercase tracking-widest">
+              <div className="mt-12 pt-8 border-t border-stone-800/50 flex items-center justify-end">
+                <button
+                  className="group text-emerald-400 text-sm font-black hover:text-emerald-300 transition-all flex items-center gap-3 uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed"
+                  onClick={() => {
+                    if (displayInfo.name !== 'Nepal') {
+                      router.push(`/region/${slugifyDistrictName(displayInfo.name)}`);
+                    }
+                  }}
+                  disabled={displayInfo.name === 'Nepal'}
+                >
                   Details
                   <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
