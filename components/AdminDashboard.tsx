@@ -2,127 +2,27 @@
 
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
-import {
-  ArrowLeft,
-  Edit3,
-  Loader2,
-  MapPin,
-  Package,
-  Plus,
-  RefreshCw,
-  Save,
-  Search,
-  ShieldCheck,
-  Trash2,
-  X,
-} from 'lucide-react';
+import { ArrowLeft, Loader2, RefreshCw, ShieldCheck } from 'lucide-react';
 
-type Region = {
-  _id: string;
-  name: string;
-  province: string;
-  description: string;
-  is_verified?: boolean;
-  location?: { coordinates?: [number, number] };
-};
+import RegionsTab from './admin/RegionsTab';
+import ProductsTab from './admin/ProductsTab';
+import InquiriesTab from './admin/InquiriesTab';
 
-type ProductRow = {
-  regionId: string;
-  regionName: string;
-  regionProvince: string;
-  exportId: string;
-  name: string;
-  description: string;
-  category: string;
-  price: number;
-  slug: string;
-};
-
-type InquiryRow = {
-  _id: string;
-  regionId?: string | null;
-  productId?: string | null;
-  regionName: string;
-  regionProvince: string;
-  productName?: string;
-  fullName: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  quantity?: string;
-  message: string;
-  status?: string;
-  createdAt?: string;
-};
-
-type RegionFormState = {
-  name: string;
-  province: string;
-  description: string;
-  coordinates: string;
-  is_verified: boolean;
-};
-
-type ProductFormState = {
-  regionId: string;
-  name: string;
-  description: string;
-  category: string;
-  price: string;
-};
-
-const emptyRegionForm: RegionFormState = {
-  name: '',
-  province: '',
-  description: '',
-  coordinates: '84.1240, 28.3949',
-  is_verified: false,
-};
-
-const emptyProductForm: ProductFormState = {
-  regionId: '',
-  name: '',
-  description: '',
-  category: 'Local Specialty',
-  price: '',
-};
-
-export default function AdminDashboard({ initialRegions, initialProducts, initialInquiries }: { initialRegions: Region[]; initialProducts: ProductRow[]; initialInquiries: InquiryRow[] }) {
+export default function AdminDashboard({
+  initialRegions,
+  initialProducts,
+  initialInquiries,
+}: {
+  initialRegions: Region[];
+  initialProducts: ProductRow[];
+  initialInquiries: InquiryRow[];
+}) {
   const [regions, setRegions] = useState<Region[]>(initialRegions);
   const [products, setProducts] = useState<ProductRow[]>(initialProducts);
   const [inquiries, setInquiries] = useState<InquiryRow[]>(initialInquiries);
   const [activeTab, setActiveTab] = useState<'regions' | 'products' | 'inquiries'>('regions');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [regionQuery, setRegionQuery] = useState('');
-  const [productQuery, setProductQuery] = useState('');
-  const [inquiryQuery, setInquiryQuery] = useState('');
-  const [editingRegionId, setEditingRegionId] = useState<string | null>(null);
-  const [editingProduct, setEditingProduct] = useState<{ exportId: string } | null>(null);
-  const [regionForm, setRegionForm] = useState<RegionFormState>(emptyRegionForm);
-  const [productForm, setProductForm] = useState<ProductFormState>(emptyProductForm);
-
-  const filteredRegions = useMemo(() => {
-    const q = regionQuery.trim().toLowerCase();
-    if (!q) return regions;
-    return regions.filter((region) =>
-      [region.name, region.province, region.description].some((value) => value?.toLowerCase().includes(q))
-    );
-  }, [regions, regionQuery]);
-
-  const filteredProducts = useMemo(() => {
-    const q = productQuery.trim().toLowerCase();
-    if (!q) return products;
-    return products.filter((product) =>
-      [product.name, product.category, product.regionName, product.regionProvince, product.description]
-        .some((value) => value?.toLowerCase().includes(q))
-    );
-  }, [products, productQuery]);
-
-  const selectedRegionProducts = useMemo(
-    () => products.filter((product) => product.regionId === productForm.regionId),
-    [products, productForm.regionId]
-  );
 
   const summary = useMemo(() => {
     const verified = regions.filter((region) => region.is_verified).length;
@@ -155,175 +55,22 @@ export default function AdminDashboard({ initialRegions, initialProducts, initia
   };
 
   const reloadData = async () => {
-    const [regionsData, productsData, inquiriesData] = await Promise.all([
-      requestJson('/api/regions'),
-      requestJson('/api/products'),
-      requestJson('/api/admin/inquiries'),
-    ]);
-    setRegions(Array.isArray(regionsData) ? regionsData : []);
-    setProducts(Array.isArray(productsData) ? productsData : []);
-    setInquiries(Array.isArray(inquiriesData) ? inquiriesData : []);
-  };
-
-  const resetRegionForm = () => {
-    setEditingRegionId(null);
-    setRegionForm(emptyRegionForm);
-  };
-
-  const resetProductForm = () => {
-    setEditingProduct(null);
-    setProductForm(emptyProductForm);
-  };
-
-  const handleRegionSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      const [lngRaw, latRaw] = regionForm.coordinates.split(',').map((part) => part.trim());
-      const coordinates: [number, number] = [Number(lngRaw), Number(latRaw)];
-      const payload = {
-        name: regionForm.name,
-        province: regionForm.province,
-        description: regionForm.description,
-        is_verified: regionForm.is_verified,
-        coordinates: coordinates.every((value) => Number.isFinite(value)) ? coordinates : [84.1240, 28.3949],
-      };
-
-      if (editingRegionId) {
-        await requestJson(`/api/admin/regions/${editingRegionId}`, {
-          method: 'PUT',
-          body: JSON.stringify(payload),
-        });
-      } else {
-        await requestJson('/api/admin/regions', {
-          method: 'POST',
-          body: JSON.stringify(payload),
-        });
-      }
-
-      await reloadData();
-      resetRegionForm();
-    } catch (err: any) {
-      setError(err?.message || 'Unable to save region');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleProductSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!productForm.regionId) {
-      setError('Select a region first');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const payload = {
-        regionId: productForm.regionId,
-        name: productForm.name,
-        description: productForm.description,
-        category: productForm.category,
-        price: Number(productForm.price || 0),
-      };
-
-      if (editingProduct) {
-        await requestJson(`/api/admin/products/${editingProduct.exportId}`, {
-          method: 'PUT',
-          body: JSON.stringify(payload),
-        });
-      } else {
-        await requestJson('/api/admin/products', {
-          method: 'POST',
-          body: JSON.stringify(payload),
-        });
-      }
-
-      await reloadData();
-      resetProductForm();
-    } catch (err: any) {
-      setError(err?.message || 'Unable to save product');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteRegion = async (regionId: string) => {
-    if (!confirm('Delete this region and all of its products?')) return;
     setLoading(true);
     setError(null);
     try {
-      await requestJson(`/api/admin/regions/${regionId}`, { method: 'DELETE' });
-      await reloadData();
-      if (editingRegionId === regionId) resetRegionForm();
+      const [regionsData, productsData, inquiriesData] = await Promise.all([
+        requestJson('/api/regions'),
+        requestJson('/api/products'),
+        requestJson('/api/admin/inquiries'),
+      ]);
+      setRegions(Array.isArray(regionsData) ? regionsData : []);
+      setProducts(Array.isArray(productsData) ? productsData : []);
+      setInquiries(Array.isArray(inquiriesData) ? inquiriesData : []);
     } catch (err: any) {
-      setError(err?.message || 'Unable to delete region');
+      setError(err?.message || 'Failed to reload data');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDeleteProduct = async (regionId: string, exportId: string) => {
-    if (!confirm('Delete this product?')) return;
-    setLoading(true);
-    setError(null);
-    try {
-      await requestJson(`/api/admin/products/${exportId}`, { method: 'DELETE' });
-      await reloadData();
-      if (editingProduct?.exportId === exportId) resetProductForm();
-    } catch (err: any) {
-      setError(err?.message || 'Unable to delete product');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredInquiries = useMemo(() => {
-    const q = inquiryQuery.trim().toLowerCase();
-    if (!q) return inquiries;
-    return inquiries.filter((inquiry) =>
-      [
-        inquiry.fullName,
-        inquiry.email,
-        inquiry.phone,
-        inquiry.company,
-        inquiry.quantity,
-        inquiry.message,
-        inquiry.regionName,
-        inquiry.regionProvince,
-        inquiry.productName,
-        inquiry.status,
-      ].some((value) => value?.toLowerCase().includes(q))
-    );
-  }, [inquiries, inquiryQuery]);
-
-  const startEditRegion = (region: Region) => {
-    setEditingRegionId(region._id);
-    const coords = region.location?.coordinates || [84.1240, 28.3949];
-    setRegionForm({
-      name: region.name,
-      province: region.province,
-      description: region.description,
-      coordinates: `${coords[0]}, ${coords[1]}`,
-      is_verified: !!region.is_verified,
-    });
-    setActiveTab('regions');
-  };
-
-  const startEditProduct = (product: ProductRow) => {
-    setEditingProduct({ exportId: product.exportId });
-    setProductForm({
-      regionId: product.regionId,
-      name: product.name,
-      description: product.description,
-      category: product.category,
-      price: String(product.price),
-    });
-    setActiveTab('products');
   };
 
   return (
@@ -430,288 +177,10 @@ export default function AdminDashboard({ initialRegions, initialProducts, initia
           </div>
         </aside>
 
-        <div className="space-y-8">
-          <div className={`space-y-8 ${activeTab === 'regions' ? '' : 'hidden'}`}>
-          <div className="bg-white rounded-[2rem] border border-stone-200 shadow-sm p-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-stone-900">{editingRegionId ? 'Edit Region' : 'Add Region'}</h2>
-                <p className="text-stone-500 mt-1">Create or update region information.</p>
-              </div>
-              {editingRegionId && (
-                <button onClick={resetRegionForm} className="inline-flex items-center gap-2 text-stone-500 hover:text-stone-900">
-                  <X size={16} />
-                  Cancel
-                </button>
-              )}
-            </div>
-
-            <form onSubmit={handleRegionSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input value={regionForm.name} onChange={(e) => setRegionForm((prev) => ({ ...prev, name: e.target.value }))} placeholder="Region name" className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none focus:border-emerald-400" />
-                <input value={regionForm.province} onChange={(e) => setRegionForm((prev) => ({ ...prev, province: e.target.value }))} placeholder="Province" className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none focus:border-emerald-400" />
-              </div>
-              <textarea value={regionForm.description} onChange={(e) => setRegionForm((prev) => ({ ...prev, description: e.target.value }))} placeholder="Description" rows={4} className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none focus:border-emerald-400" />
-              <input value={regionForm.coordinates} onChange={(e) => setRegionForm((prev) => ({ ...prev, coordinates: e.target.value }))} placeholder="Longitude, Latitude" className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none focus:border-emerald-400" />
-              <label className="flex items-center gap-3 text-sm text-stone-600">
-                <input type="checkbox" checked={regionForm.is_verified} onChange={(e) => setRegionForm((prev) => ({ ...prev, is_verified: e.target.checked }))} />
-                Verified export hub
-              </label>
-
-              <button type="submit" disabled={loading} className="inline-flex items-center gap-2 rounded-full bg-stone-900 px-6 py-3 text-white font-semibold hover:bg-stone-800 transition-colors disabled:opacity-50">
-                {loading ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-                {editingRegionId ? 'Save Region' : 'Create Region'}
-              </button>
-            </form>
-          </div>
-
-          <div className="bg-white rounded-[2rem] border border-stone-200 shadow-sm p-8">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-4">
-              <div>
-                <h2 className="text-2xl font-bold text-stone-900">Regions</h2>
-                <p className="text-stone-500 mt-1">View, edit, or delete region records.</p>
-              </div>
-              <div className="relative w-full lg:max-w-xs">
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
-                <input value={regionQuery} onChange={(e) => setRegionQuery(e.target.value)} placeholder="Search regions" className="w-full rounded-full border border-stone-200 bg-stone-50 pl-10 pr-4 py-3 outline-none focus:border-emerald-400" />
-              </div>
-            </div>
-
-            <div className="space-y-4 max-h-[720px] overflow-auto pr-1">
-              {filteredRegions.map((region) => (
-                <div key={region._id} className="rounded-3xl border border-stone-200 bg-stone-50 p-5">
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-2 text-stone-500 text-sm">
-                        <MapPin size={14} />
-                        <span>{region.province}</span>
-                        {region.is_verified && <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase"><ShieldCheck size={10} /> Verified</span>}
-                      </div>
-                      <h3 className="text-xl font-bold text-stone-900">{region.name}</h3>
-                      <p className="text-stone-500 mt-2 leading-relaxed">{region.description}</p>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
-                      <button onClick={() => startEditRegion(region)} className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:border-emerald-300 hover:text-emerald-700">
-                        <Edit3 size={14} />
-                        Edit
-                      </button>
-                      <button onClick={() => handleDeleteRegion(region._id)} className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50">
-                        <Trash2 size={14} />
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {products.filter((product) => product.regionId === region._id).map((product) => (
-                      <span key={product.exportId} className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700">
-                        <Package size={14} className="text-emerald-600" />
-                        {product.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              {filteredRegions.length === 0 && <div className="text-center text-stone-500 py-12">No regions found.</div>}
-            </div>
-          </div>
-          </div>
-
-          <div className={`space-y-8 ${activeTab === 'products' ? '' : 'hidden'}`}>
-          <div className="bg-white rounded-[2rem] border border-stone-200 shadow-sm p-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-stone-900">{editingProduct ? 'Edit Product' : 'Add Product'}</h2>
-                <p className="text-stone-500 mt-1">Products are stored inside a region.</p>
-              </div>
-              {editingProduct && (
-                <button onClick={resetProductForm} className="inline-flex items-center gap-2 text-stone-500 hover:text-stone-900">
-                  <X size={16} />
-                  Cancel
-                </button>
-              )}
-            </div>
-
-            <form onSubmit={handleProductSubmit} className="space-y-4">
-              <select value={productForm.regionId} onChange={(e) => setProductForm((prev) => ({ ...prev, regionId: e.target.value }))} className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none focus:border-emerald-400">
-                <option value="">Select region</option>
-                {regions.map((region) => (
-                  <option key={region._id} value={region._id}>{region.name}</option>
-                ))}
-              </select>
-
-              {productForm.regionId && (
-                <div className="rounded-3xl border border-stone-200 bg-stone-50 p-4">
-                  <div className="flex items-center justify-between gap-3 mb-3">
-                    <div>
-                      <h3 className="text-sm font-bold text-stone-900">Existing products in this region</h3>
-                      <p className="text-xs text-stone-500 mt-1">Select one to edit, or continue below to add a new product.</p>
-                    </div>
-                    <span className="text-xs font-semibold text-stone-500">{selectedRegionProducts.length}</span>
-                  </div>
-
-                  {selectedRegionProducts.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-stone-300 bg-white px-4 py-5 text-sm text-stone-500">
-                      No products are stored in this region yet.
-                    </div>
-                  ) : (
-                    <div className="space-y-2 max-h-56 overflow-auto pr-1">
-                      {selectedRegionProducts.map((product) => (
-                        <div key={product.exportId} className="flex items-start justify-between gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3">
-                          <div>
-                            <div className="font-semibold text-stone-900">{product.name}</div>
-                            <div className="text-xs text-stone-500 mt-1">{product.category} • Price: {product.price}</div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => startEditProduct(product)}
-                            className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-stone-50 px-3 py-2 text-xs font-semibold text-stone-700 hover:border-emerald-300 hover:text-emerald-700"
-                          >
-                            <Edit3 size={12} />
-                            Edit
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input value={productForm.name} onChange={(e) => setProductForm((prev) => ({ ...prev, name: e.target.value }))} placeholder="Product name" className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none focus:border-emerald-400" />
-                <input value={productForm.category} onChange={(e) => setProductForm((prev) => ({ ...prev, category: e.target.value }))} placeholder="Category" className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none focus:border-emerald-400" />
-              </div>
-              <input value={productForm.price} onChange={(e) => setProductForm((prev) => ({ ...prev, price: e.target.value }))} placeholder="Price" className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none focus:border-emerald-400" />
-              <textarea value={productForm.description} onChange={(e) => setProductForm((prev) => ({ ...prev, description: e.target.value }))} placeholder="Product description" rows={4} className="w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 outline-none focus:border-emerald-400" />
-
-              <button type="submit" disabled={loading} className="inline-flex items-center gap-2 rounded-full bg-stone-900 px-6 py-3 text-white font-semibold hover:bg-stone-800 transition-colors disabled:opacity-50">
-                {loading ? <Loader2 className="animate-spin" size={16} /> : <Plus size={16} />}
-                {editingProduct ? 'Save Product' : 'Create Product'}
-              </button>
-            </form>
-          </div>
-
-          <div className="bg-white rounded-[2rem] border border-stone-200 shadow-sm p-8">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-4">
-              <div>
-                <h2 className="text-2xl font-bold text-stone-900">Products</h2>
-                <p className="text-stone-500 mt-1">View, edit, or delete all products.</p>
-              </div>
-              <div className="relative w-full lg:max-w-xs">
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
-                <input value={productQuery} onChange={(e) => setProductQuery(e.target.value)} placeholder="Search products" className="w-full rounded-full border border-stone-200 bg-stone-50 pl-10 pr-4 py-3 outline-none focus:border-emerald-400" />
-              </div>
-            </div>
-
-            <div className="space-y-4 max-h-[720px] overflow-auto pr-1">
-              {filteredProducts.map((product) => (
-                <div key={product.exportId} className="rounded-3xl border border-stone-200 bg-stone-50 p-5">
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-2 text-stone-500 text-sm">
-                        <MapPin size={14} />
-                        <span>{product.regionName}</span>
-                        <span className="text-stone-300">•</span>
-                        <span>{product.regionProvince}</span>
-                      </div>
-                      <h3 className="text-xl font-bold text-stone-900">{product.name}</h3>
-                      <p className="text-stone-500 mt-2 leading-relaxed">{product.description}</p>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
-                      <Link href={`/exports/${product.slug}`} className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:border-emerald-300 hover:text-emerald-700">
-                        View
-                      </Link>
-                      <button onClick={() => startEditProduct(product)} className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:border-emerald-300 hover:text-emerald-700">
-                        <Edit3 size={14} />
-                        Edit
-                      </button>
-                      <button onClick={() => handleDeleteProduct(product.regionId, product.exportId)} className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50">
-                        <Trash2 size={14} />
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <span className="inline-flex items-center rounded-2xl bg-white border border-stone-200 px-3 py-2 text-sm text-stone-700">{product.category}</span>
-                    <span className="inline-flex items-center rounded-2xl bg-white border border-stone-200 px-3 py-2 text-sm text-stone-700">Price: {product.price}</span>
-                  </div>
-                </div>
-              ))}
-              {filteredProducts.length === 0 && <div className="text-center text-stone-500 py-12">No products found.</div>}
-            </div>
-          </div>
-          </div>
-
-          <div className={`space-y-8 ${activeTab === 'inquiries' ? '' : 'hidden'}`}>
-          <div className="bg-white rounded-[2rem] border border-stone-200 shadow-sm p-8">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-4">
-              <div>
-                <h2 className="text-2xl font-bold text-stone-900">Inquiries</h2>
-                <p className="text-stone-500 mt-1">View submitted supply requests from the district pages.</p>
-              </div>
-              <div className="relative w-full lg:max-w-xs">
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
-                <input value={inquiryQuery} onChange={(e) => setInquiryQuery(e.target.value)} placeholder="Search inquiries" className="w-full rounded-full border border-stone-200 bg-stone-50 pl-10 pr-4 py-3 outline-none focus:border-emerald-400" />
-              </div>
-            </div>
-
-            <div className="space-y-4 max-h-[760px] overflow-auto pr-1">
-              {filteredInquiries.map((inquiry) => (
-                <div key={inquiry._id} className="rounded-3xl border border-stone-200 bg-stone-50 p-5">
-                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2 mb-2 text-stone-500 text-sm">
-                        <MapPin size={14} />
-                        <span>{inquiry.regionName}</span>
-                        <span className="text-stone-300">•</span>
-                        <span>{inquiry.regionProvince}</span>
-                        {inquiry.status && <span className="rounded-full bg-white border border-stone-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">{inquiry.status}</span>}
-                      </div>
-                      <h3 className="text-xl font-bold text-stone-900">{inquiry.fullName}</h3>
-                      <p className="text-stone-500 mt-2 leading-relaxed">{inquiry.message}</p>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
-                      <a href={`mailto:${inquiry.email}`} className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:border-emerald-300 hover:text-emerald-700">
-                        Reply
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-stone-600">
-                    <div className="rounded-2xl border border-stone-200 bg-white px-4 py-3">
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-1">Email</div>
-                      <div className="font-medium break-all">{inquiry.email}</div>
-                    </div>
-                    <div className="rounded-2xl border border-stone-200 bg-white px-4 py-3">
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-1">Product</div>
-                      <div className="font-medium">{inquiry.productName || 'General inquiry'}</div>
-                    </div>
-                    {inquiry.phone && (
-                      <div className="rounded-2xl border border-stone-200 bg-white px-4 py-3">
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-1">Phone</div>
-                        <div className="font-medium">{inquiry.phone}</div>
-                      </div>
-                    )}
-                    {inquiry.company && (
-                      <div className="rounded-2xl border border-stone-200 bg-white px-4 py-3">
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-1">Company</div>
-                        <div className="font-medium">{inquiry.company}</div>
-                      </div>
-                    )}
-                  </div>
-
-                  {inquiry.quantity && (
-                    <div className="mt-3 text-sm text-stone-500">
-                      Quantity: <span className="font-medium text-stone-700">{inquiry.quantity}</span>
-                    </div>
-                  )}
-                </div>
-              ))}
-              {filteredInquiries.length === 0 && <div className="text-center text-stone-500 py-12">No inquiries found.</div>}
-            </div>
-          </div>
-          </div>
+        <div className="space-y-8 min-w-0">
+          {activeTab === 'regions' && <RegionsTab regions={regions} products={products} reloadData={reloadData} />}
+          {activeTab === 'products' && <ProductsTab regions={regions} products={products} reloadData={reloadData} />}
+          {activeTab === 'inquiries' && <InquiriesTab inquiries={inquiries} />}
         </div>
       </section>
     </div>
