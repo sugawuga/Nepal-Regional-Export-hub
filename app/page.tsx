@@ -6,13 +6,21 @@ export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   let regionsArray: any[] = [];
+  let productsArray: any[] = [];
   let error: string | null = null;
 
   try {
     const baseUrl = process.env.APP_URL || 'http://localhost:3000';
-    const res = await fetch(new URL('/api/regions', baseUrl).toString(), { cache: 'no-store' });
-    if (!res.ok) throw new Error(`Failed to fetch regions (${res.status})`);
-    regionsArray = (await res.json()) as any[];
+    const [regionsRes, productsRes] = await Promise.all([
+      fetch(new URL('/api/regions', baseUrl).toString(), { cache: 'no-store' }),
+      fetch(new URL('/api/products', baseUrl).toString(), { cache: 'no-store' }),
+    ]);
+
+    if (!regionsRes.ok) throw new Error(`Failed to fetch regions (${regionsRes.status})`);
+    if (!productsRes.ok) throw new Error(`Failed to fetch products (${productsRes.status})`);
+
+    regionsArray = (await regionsRes.json()) as any[];
+    productsArray = (await productsRes.json()) as any[];
   } catch (err: any) {
     error = err?.message ?? 'Failed to load regions';
   }
@@ -65,7 +73,7 @@ export default async function Home() {
             </div>
           </div>
         ) : (
-          <RegionSearch initialRegions={regionsArray} />
+          <RegionSearch initialRegions={regionsArray} initialProducts={productsArray} />
         )}
       </section>
     </div>

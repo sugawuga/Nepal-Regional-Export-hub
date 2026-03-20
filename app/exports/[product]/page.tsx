@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, MapPin, Package } from 'lucide-react';
-import { connectDB, Region as RegionModel } from '@/lib/db';
+import { connectDB, Product as ProductModel, Region as RegionModel, RegionProduct as RegionProductModel } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,17 +10,8 @@ interface ProductRegion {
   province: string;
   slug: string;
   description: string;
-  exportDescription: string;
   category: string;
   price: number | string;
-}
-
-function slugifyName(name: string) {
-  return name
-    .toLowerCase()
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 }
 
 function titleCaseFromSlug(slug: string) {
@@ -36,34 +27,36 @@ export default async function ProductPage({ params }: { params: Promise<{ produc
   const productSlug = decodeURIComponent(product);
 
   await connectDB();
-  const regions = await RegionModel.find().lean();
+  const [regions, products, links] = await Promise.all([
+    RegionModel.find().lean(),
+    ProductModel.find({ slug: productSlug }).lean(),
+    RegionProductModel.find().lean(),
+  ]);
+  const productIds = new Set((products as any[]).map((item) => String(item._id)));
+  const regionMap = new Map((regions as any[]).map((region) => [String(region._id), region]));
 
   const matchedRegions: ProductRegion[] = [];
   let productName = titleCaseFromSlug(productSlug);
 
-  for (const region of regions as any[]) {
-    const exportsList = Array.isArray(region.exports) ? region.exports : [];
-    for (const exp of exportsList) {
-      const exportName = String(exp?.name || '').trim();
-      if (!exportName) continue;
+  for (const link of links as any[]) {
+    if (!productIds.has(String(link.productId))) continue;
+    const region = regionMap.get(String(link.regionId));
+    if (!region) continue;
 
-      if (slugifyName(exportName) !== productSlug) continue;
-
-      productName = exportName;
-      matchedRegions.push({
-        name: String(region.name || ''),
-        province: String(region.province || 'Nepal'),
-        slug: String(region.name || '')
-          .toLowerCase()
-          .replace(/&/g, 'and')
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, ''),
-        description: String(region.description || ''),
-        exportDescription: String(exp.description || ''),
-        category: String(exp.category || 'Export'),
-        price: exp.price ?? '—',
-      });
-    }
+    const product = (products as any[])[0];
+    productName = String(product?.name || productName);
+    matchedRegions.push({
+      name: String(region.name || ''),
+      province: String(region.province || 'Nepal'),
+      slug: String(region.name || '')
+        .toLowerCase()
+        .replace(/&/g, 'and')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, ''),
+      description: String(link.description || ''),
+      category: String(link.category || 'Export'),
+      price: link.price ?? '—',
+    });
   }
 
   if (matchedRegions.length === 0) {

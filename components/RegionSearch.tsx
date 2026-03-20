@@ -10,15 +10,25 @@ interface Region {
   _id: string;
   name: string;
   description: string;
-  exports: { name: string }[];
   is_verified?: boolean;
+}
+
+interface Product {
+  exportId: string;
+  regionId: string;
+  name: string;
+  description: string;
+  category: string;
+  price: number;
+  slug: string;
 }
 
 interface RegionSearchProps {
   initialRegions: Region[];
+  initialProducts: Product[];
 }
 
-export default function RegionSearch({ initialRegions }: RegionSearchProps) {
+export default function RegionSearch({ initialRegions, initialProducts }: RegionSearchProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [regions, setRegions] = useState<Region[]>(initialRegions);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -93,10 +103,9 @@ export default function RegionSearch({ initialRegions }: RegionSearchProps) {
         .map(r => r.name);
 
       // 2. Match Export/Product Names
-      const productMatches = initialRegions
-        .flatMap(r => r.exports)
-        .filter(e => e.name.toLowerCase().includes(query))
-        .map(e => e.name);
+      const productMatches = initialProducts
+        .filter((product) => product.name.toLowerCase().includes(query))
+        .map((product) => product.name);
 
       // 3. Match from Fallback Districts (Locations)
       const locationMatches = DISTRICT_NAMES.filter(d => 
@@ -115,7 +124,7 @@ export default function RegionSearch({ initialRegions }: RegionSearchProps) {
 
     const timeoutId = setTimeout(fetchSuggestions, 200);
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, initialRegions]);
+  }, [searchQuery, initialRegions, initialProducts]);
 
   // Handle clicking outside to close suggestions
   useEffect(() => {
@@ -155,7 +164,7 @@ export default function RegionSearch({ initialRegions }: RegionSearchProps) {
           <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-stone-200 rounded-2xl shadow-xl z-50 overflow-hidden">
             {suggestions.map((suggestion, idx) => {
               const isLocal = initialRegions.some(r => r.name.toLowerCase() === suggestion.toLowerCase());
-              const isProduct = initialRegions.some(r => r.exports.some(e => e.name.toLowerCase() === suggestion.toLowerCase()));
+              const isProduct = initialProducts.some(product => product.name.toLowerCase() === suggestion.toLowerCase());
               
               return (
                 <button
@@ -230,14 +239,17 @@ export default function RegionSearch({ initialRegions }: RegionSearchProps) {
                   </div>
                   <p className="text-stone-500 mb-6 leading-relaxed">{region.description}</p>
                   <div className="flex flex-wrap gap-2">
-                    {region.exports.slice(0, 3).map((exp: any, i: number) => (
-                      <span key={i} className="px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-lg text-xs font-medium text-stone-600">
-                        {exp.name}
-                      </span>
-                    ))}
-                    {region.exports.length > 3 && (
+                    {initialProducts
+                      .filter((product) => product.regionId === region._id)
+                      .slice(0, 3)
+                      .map((product) => (
+                        <span key={product.exportId} className="px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-lg text-xs font-medium text-stone-600">
+                          {product.name}
+                        </span>
+                      ))}
+                    {initialProducts.filter((product) => product.regionId === region._id).length > 3 && (
                       <span className="px-3 py-1.5 bg-stone-50 border border-stone-200 rounded-lg text-xs font-medium text-stone-500">
-                        +{region.exports.length - 3} more
+                        +{initialProducts.filter((product) => product.regionId === region._id).length - 3} more
                       </span>
                     )}
                   </div>

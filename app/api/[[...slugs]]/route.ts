@@ -1,14 +1,16 @@
 import { Elysia } from 'elysia';
 import mongoose from 'mongoose';
-import { connectDB, Region } from '@/lib/db';
-import { getSeedRegions } from '@/lib/seed-data';
+import { connectDB, Product, Region, RegionProduct } from '@/lib/db';
+import { getSeedProducts, getSeedRegionProducts, getSeedRegions } from '@/lib/seed-data';
 
-const createExportItem = (input: any) => ({
-  name: String(input?.name || '').trim(),
-  description: String(input?.description || '').trim(),
-  category: String(input?.category || 'Local Specialty').trim(),
-  price: Number(input?.price ?? 0),
-});
+const slugify = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const normalizeBoolean = (value: any) => {
   if (typeof value === 'boolean') return value;
@@ -31,8 +33,77 @@ const createRegionPayload = (input: any) => {
       type: 'Point',
       coordinates: (coordinates && coordinates.length === 2 ? coordinates : [84.1240, 28.3949]) as [number, number],
     },
-    exports: Array.isArray(input?.exports) ? input.exports.map(createExportItem).filter((item: any) => item.name) : [],
   };
+};
+
+const createProductPayload = (input: any) => ({
+  regionId: input?.regionId,
+  productId: input?.productId,
+  name: String(input?.name || '').trim(),
+  slug: slugify(String(input?.slug || input?.name || '').trim()),
+  description: String(input?.description || '').trim(),
+  category: String(input?.category || 'Local Specialty').trim(),
+  price: Number(input?.price ?? 0),
+});
+
+const ensureBaseProduct = async (payload: { productId?: string; name: string; slug: string }) => {
+  if (payload.productId && mongoose.Types.ObjectId.isValid(payload.productId)) {
+    const existing = await Product.findById(payload.productId).lean();
+    if (existing) return existing;
+  }
+
+  if (!payload.name) return null;
+
+  const slug = payload.slug || slugify(payload.name);
+  const existingBySlug = await Product.findOne({ slug }).lean();
+  if (existingBySlug) return existingBySlug;
+
+  return await Product.create({ name: payload.name, slug });
+};
+
+const cleanupOrphanProduct = async (productId?: string | mongoose.Types.ObjectId | null) => {
+  if (!productId || !mongoose.Types.ObjectId.isValid(String(productId))) return;
+
+  const objectId = new mongoose.Types.ObjectId(String(productId));
+  const remainingLinks = await RegionProduct.countDocuments({ productId: objectId });
+  if (remainingLinks === 0) {
+    await Product.findByIdAndDelete(objectId);
+  }
+};
+
+const serializeProduct = (entry: any, region: any, product: any) => {
+  return {
+    exportId: String(entry._id),
+    regionId: String(region._id),
+    regionName: region.name,
+    regionProvince: region.province,
+    productId: String(product._id),
+    name: product.name,
+    slug: product.slug || slugify(String(product.name || '')),
+    description: entry.description,
+    category: entry.category,
+    price: entry.price,
+  };
+};
+
+const listProductsWithRegions = async () => {
+  const [regions, products, links] = await Promise.all([
+    Region.find().lean(),
+    Product.find().lean(),
+    RegionProduct.find().lean(),
+  ]);
+
+  const regionMap = new Map((regions as any[]).map((region) => [String(region._id), region]));
+  const productMap = new Map((products as any[]).map((product) => [String(product._id), product]));
+
+  return (links as any[])
+    .map((link) => {
+      const region = regionMap.get(String(link.regionId));
+      const product = productMap.get(String(link.productId));
+      if (!region || !product) return null;
+      return serializeProduct(link, region, product);
+    })
+    .filter(Boolean);
 };
 
 const app = new Elysia({ prefix: '/api' })
@@ -40,25 +111,11 @@ const app = new Elysia({ prefix: '/api' })
     // Ensure DB connection before handling any request
     await connectDB();
   })
+  .get('/products', async () => {
+    return await listProductsWithRegions();
+  })
   .get('/admin/products', async () => {
-    const regions = await Region.find().lean();
-    return (regions as any[]).flatMap((region) =>
-      (region.exports || []).map((exp: any) => ({
-        regionId: String(region._id),
-        regionName: region.name,
-        regionProvince: region.province,
-        exportId: String(exp._id),
-        name: exp.name,
-        description: exp.description,
-        category: exp.category,
-        price: exp.price,
-        slug: String(exp.name || '')
-          .toLowerCase()
-          .replace(/&/g, 'and')
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, ''),
-      }))
-    );
+    return await listProductsWithRegions();
   })
   .post('/admin/regions', async ({ body }) => {
     const payload = createRegionPayload(body);
@@ -90,7 +147,6 @@ const app = new Elysia({ prefix: '/api' })
       description: payload.description,
       is_verified: normalizeBoolean((rawBody as any)?.is_verified ?? (rawBody as any)?.isVerified),
       location: payload.location,
-      exports: payload.exports,
     };
 
     const result = await Region.collection.updateOne({ _id: objectId }, { $set: update });
@@ -103,70 +159,132 @@ const app = new Elysia({ prefix: '/api' })
     return await Region.collection.findOne({ _id: objectId });
   })
   .delete('/admin/regions/:id', async ({ params: { id }, set }) => {
-    const deleted = await Region.findByIdAndDelete(id).lean();
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      set.status = 400;
+      return { error: 'Invalid region id' };
+    }
+
+    const objectId = new mongoose.Types.ObjectId(id);
+    const linkedProducts = await RegionProduct.find({ regionId: objectId }).lean();
+    await RegionProduct.deleteMany({ regionId: objectId });
+
+    const deleted = await Region.findByIdAndDelete(objectId).lean();
     if (!deleted) {
       set.status = 404;
       return { error: 'Region not found' };
     }
 
+    const uniqueProductIds = Array.from(new Set((linkedProducts as any[]).map((link) => String(link.productId))));
+    await Promise.all(uniqueProductIds.map((productId) => cleanupOrphanProduct(productId)));
+
     return { success: true };
   })
-  .post('/admin/regions/:id/exports', async ({ params: { id }, body, set }) => {
-    const region = await Region.findById(id);
-    if (!region) {
+  .post('/admin/products', async ({ body, set }) => {
+    const payload = createProductPayload(body);
+    if (!payload.regionId || !mongoose.Types.ObjectId.isValid(payload.regionId)) {
+      set.status = 400;
+      return { error: 'regionId is required' };
+    }
+
+    const regionDoc = await Region.findById(payload.regionId).lean();
+    if (!regionDoc) {
       set.status = 404;
       return { error: 'Region not found' };
     }
 
-    const item = createExportItem(body);
-    if (!item.name || !item.description || !item.category) {
+    if (!payload.name || !payload.description || !payload.category) {
       set.status = 400;
       return { error: 'name, description, and category are required' };
     }
 
-    region.exports.push(item as any);
-    await region.save();
-    return region.toObject();
+    const baseProduct = await ensureBaseProduct(payload);
+    if (!baseProduct) {
+      set.status = 400;
+      return { error: 'product name is required' };
+    }
+
+    const existingLink = await RegionProduct.findOne({ regionId: payload.regionId, productId: baseProduct._id }).lean();
+    if (existingLink) {
+      set.status = 409;
+      return { error: 'Product already exists for this region' };
+    }
+
+    const created = await RegionProduct.create({
+      regionId: payload.regionId,
+      productId: baseProduct._id,
+      description: payload.description,
+      category: payload.category,
+      price: payload.price,
+    });
+
+    return serializeProduct(created.toObject(), regionDoc, baseProduct);
   })
-  .put('/admin/regions/:id/exports/:exportId', async ({ params: { id, exportId }, body, set }) => {
-    const region = await Region.findById(id);
-    if (!region) {
+  .put('/admin/products/:id', async ({ params: { id }, body, set }) => {
+    const payload = createProductPayload(body);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      set.status = 400;
+      return { error: 'Invalid product id' };
+    }
+
+    if (!payload.regionId || !mongoose.Types.ObjectId.isValid(payload.regionId)) {
+      set.status = 400;
+      return { error: 'regionId is required' };
+    }
+
+    const regionDoc = await Region.findById(payload.regionId).lean();
+    if (!regionDoc) {
       set.status = 404;
       return { error: 'Region not found' };
     }
 
-    const exportItem = region.exports.id(exportId);
-    if (!exportItem) {
-      set.status = 404;
-      return { error: 'Product not found' };
-    }
-
-    const item = createExportItem(body);
-    if (!item.name || !item.description || !item.category) {
+    if (!payload.name || !payload.description || !payload.category) {
       set.status = 400;
       return { error: 'name, description, and category are required' };
     }
 
-    exportItem.set(item);
-    await region.save();
-    return region.toObject();
-  })
-  .delete('/admin/regions/:id/exports/:exportId', async ({ params: { id, exportId }, set }) => {
-    const region = await Region.findById(id);
-    if (!region) {
-      set.status = 404;
-      return { error: 'Region not found' };
+    const baseProduct = await ensureBaseProduct(payload);
+    if (!baseProduct) {
+      set.status = 400;
+      return { error: 'product name is required' };
     }
 
-    const exportItem = region.exports.id(exportId);
-    if (!exportItem) {
+    const previous = await RegionProduct.findById(id).lean();
+    const updated = await RegionProduct.findByIdAndUpdate(id, {
+      $set: {
+        regionId: payload.regionId,
+        productId: baseProduct._id,
+        description: payload.description,
+        category: payload.category,
+        price: payload.price,
+      },
+    }, { new: true }).lean();
+    if (!updated) {
       set.status = 404;
       return { error: 'Product not found' };
     }
 
-    exportItem.deleteOne();
-    await region.save();
-    return region.toObject();
+    if (previous && String(previous.productId) !== String(baseProduct._id)) {
+      await cleanupOrphanProduct(previous.productId as any);
+    }
+
+    return serializeProduct(updated, regionDoc, baseProduct);
+  })
+  .delete('/admin/products/:id', async ({ params: { id }, set }) => {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      set.status = 400;
+      return { error: 'Invalid product id' };
+    }
+
+    const deleted = await RegionProduct.findByIdAndDelete(id).lean();
+
+    if (!deleted) {
+      set.status = 404;
+      return { error: 'Product not found' };
+    }
+
+    await cleanupOrphanProduct((deleted as any).productId);
+
+    return { success: true };
   })
   .get('/regions', async ({ query }) => {
     const { q } = query as Record<string, string | undefined>;
@@ -177,28 +295,107 @@ const app = new Elysia({ prefix: '/api' })
     // Seed mock data if empty for demonstration
     const count = await Region.countDocuments();
     if (count === 0) {
-      await Region.create(getSeedRegions());
+      const regions = await Region.insertMany(getSeedRegions());
+      const regionIdByName = new Map((regions as any[]).map((region) => [String(region.name).toLowerCase(), region._id]));
+      const baseProducts = await Product.insertMany(getSeedProducts());
+      const productIdByName = new Map((baseProducts as any[]).map((product) => [String(product.name).toLowerCase(), product._id]));
+
+      const regionProducts = getSeedRegionProducts()
+        .map((item) => ({
+          regionId: regionIdByName.get(item.regionName.toLowerCase()),
+          productId: productIdByName.get(item.productName.toLowerCase()),
+          description: item.description,
+          category: item.category,
+          price: item.price,
+        }))
+        .filter((item) => item.regionId && item.productId);
+
+      if (regionProducts.length) {
+        await RegionProduct.insertMany(regionProducts as any[]);
+      }
+    } else {
+      const productCount = await Product.countDocuments();
+      const relationCount = await RegionProduct.countDocuments();
+      if (productCount === 0 || relationCount === 0) {
+        const regions = await Region.find().lean();
+        if (productCount === 0) {
+          await Product.insertMany(getSeedProducts());
+        }
+
+        const baseProducts = await Product.find().lean();
+        const regionIdByName = new Map((regions as any[]).map((region) => [String(region.name).toLowerCase(), region._id]));
+        const productIdByName = new Map((baseProducts as any[]).map((product) => [String(product.name).toLowerCase(), product._id]));
+
+        if (relationCount === 0) {
+          const regionProducts = getSeedRegionProducts()
+            .map((item) => ({
+              regionId: regionIdByName.get(item.regionName.toLowerCase()),
+              productId: productIdByName.get(item.productName.toLowerCase()),
+              description: item.description,
+              category: item.category,
+              price: item.price,
+            }))
+            .filter((item) => item.regionId && item.productId);
+
+          if (regionProducts.length) {
+            await RegionProduct.insertMany(regionProducts as any[]);
+          }
+        }
+      }
     }
 
     if (q) {
-      const searchRegex = new RegExp(q, 'i');
-      return await Region.find({
-        $or: [
-          { name: searchRegex },
-          { description: searchRegex },
-          { 'exports.name': searchRegex }
-        ]
-      }).lean();
+      const searchRegex = new RegExp(escapeRegExp(q), 'i');
+
+      const [regionsByText, productsByText, linksByText] = await Promise.all([
+        Region.find({
+          $or: [
+            { name: searchRegex },
+            { province: searchRegex },
+            { description: searchRegex },
+          ],
+        }).lean(),
+        Product.find({
+          $or: [{ name: searchRegex }, { slug: searchRegex }],
+        }).lean(),
+        RegionProduct.find({
+          $or: [{ description: searchRegex }, { category: searchRegex }],
+        }).lean(),
+      ]);
+
+      const regionIds = new Set((regionsByText as any[]).map((region) => String(region._id)));
+      const matchedProductIds = new Set((productsByText as any[]).map((product) => String(product._id)));
+
+      for (const link of linksByText as any[]) {
+        if (matchedProductIds.has(String(link.productId))) {
+          regionIds.add(String(link.regionId));
+        }
+      }
+
+      if (regionIds.size === 0) {
+        return [];
+      }
+
+      return await Region.find({ _id: { $in: Array.from(regionIds) } }).lean();
     }
 
     return await Region.find().lean();
   })
   .get('/regions/:name', async ({ params: { name } }) => {
-    return await Region.findOne({ name: new RegExp(`^${name}$`, 'i') }).lean();
+    return await Region.findOne({ name: new RegExp(`^${escapeRegExp(name)}$`, 'i') }).lean();
   })
   .get('/produce/:id', async ({ params: { id } }) => {
-    const region = await Region.findOne({ 'exports._id': id }).lean();
-    return region?.exports.find((e: any) => e._id.toString() === id) || null;
+    const relation = await RegionProduct.findById(id).lean();
+    if (!relation) return null;
+
+    const [region, product] = await Promise.all([
+      Region.findById((relation as any).regionId).lean(),
+      Product.findById((relation as any).productId).lean(),
+    ]);
+
+    if (!region || !product) return null;
+
+    return serializeProduct(relation, region, product);
   })
   .get('/search/near', async ({ query }) => {
     const { lat, lng, distance = "50000" } = query as Record<string, string | undefined>;

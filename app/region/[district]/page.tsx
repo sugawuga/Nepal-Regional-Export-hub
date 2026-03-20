@@ -1,5 +1,4 @@
-import { eden } from '@/lib/eden';
-import { connectDB, Region as RegionModel } from '@/lib/db';
+import { connectDB, Product as ProductModel, Region as RegionModel, RegionProduct as RegionProductModel } from '@/lib/db';
 import Link from 'next/link';
 import { ArrowLeft, MapPin, Package, Tag, Info, Globe, ShieldCheck } from 'lucide-react';
 import { notFound } from 'next/navigation';
@@ -16,7 +15,8 @@ interface Region {
   province: string;
   description: string;
   location: { coordinates: number[] };
-  exports: {
+  products: {
+    _id?: string;
     name: string;
     description: string;
     category: string;
@@ -31,6 +31,12 @@ export default async function RegionPage({ params }: PageProps) {
   // 1. Try to fetch from MongoDB (server-side)
   await connectDB();
   const dbRegion = await RegionModel.findOne({ name: new RegExp(`^${districtSlug.replace(/-/g, ' ')}$`, 'i') }).lean();
+  const [products, links] = dbRegion
+    ? await Promise.all([
+        ProductModel.find().lean(),
+        RegionProductModel.find({ regionId: (dbRegion as any)._id }).lean(),
+      ])
+    : [[], []];
 
   // 2. Fallback to in-memory district data if the DB doesn't have it
   const fallbackData =
@@ -47,13 +53,22 @@ export default async function RegionPage({ params }: PageProps) {
     province: (dbRegion as any).province,
     description: (dbRegion as any).description,
     location: (dbRegion as any).location,
-    exports: (dbRegion as any).exports
+    products: (links as any[]).map((link) => {
+      const product = (products as any[]).find((entry) => String(entry._id) === String(link.productId));
+      return {
+        _id: String(link._id),
+        name: product?.name || 'Unknown Product',
+        description: link.description,
+        category: link.category,
+        price: link.price,
+      };
+    })
   } : {
     name: fallbackData.name,
     province: fallbackData.province,
     description: fallbackData.description,
     location: { coordinates: [84.1240, 28.3949] }, // Default center of Nepal
-    exports: fallbackData.exports.map(e => ({
+    products: fallbackData.exports.map(e => ({
       name: e,
       description: "Regional specialty with high export potential.",
       category: "Local Specialty",
@@ -134,8 +149,8 @@ export default async function RegionPage({ params }: PageProps) {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {region.exports.map((item: any, idx: number) => (
-              <div key={idx} className="group bg-white p-8 rounded-[2.5rem] border border-stone-200 hover:border-emerald-300 transition-all shadow-sm hover:shadow-xl hover:shadow-emerald-900/5">
+            {region.products.map((item: any, idx: number) => (
+              <div key={item._id || idx} className="group bg-white p-8 rounded-[2.5rem] border border-stone-200 hover:border-emerald-300 transition-all shadow-sm hover:shadow-xl hover:shadow-emerald-900/5">
                 <div className="w-12 h-12 rounded-2xl bg-stone-50 flex items-center justify-center mb-6 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors text-stone-400">
                   <Package size={24} />
                 </div>
@@ -173,7 +188,7 @@ export default async function RegionPage({ params }: PageProps) {
               </div>
               <h3 className="text-3xl font-bold mb-6 tracking-tight">Economic Significance</h3>
               <p className="text-stone-400 leading-relaxed text-lg">
-                {region.name} serves as a critical node in Nepal&apos;s trade network. Its unique climatic conditions and traditional expertise contribute significantly to the national export volume, particularly in the {region.exports[0]?.category?.toLowerCase() || 'agricultural'} sector.
+                {region.name} serves as a critical node in Nepal&apos;s trade network. Its unique climatic conditions and traditional expertise contribute significantly to the national export volume, particularly in the {region.products[0]?.category?.toLowerCase() || 'agricultural'} sector.
               </p>
             </div>
           </div>

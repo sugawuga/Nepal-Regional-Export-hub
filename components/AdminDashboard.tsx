@@ -24,13 +24,6 @@ type Region = {
   description: string;
   is_verified?: boolean;
   location?: { coordinates?: [number, number] };
-  exports: {
-    _id: string;
-    name: string;
-    description: string;
-    category: string;
-    price: number;
-  }[];
 };
 
 type ProductRow = {
@@ -77,43 +70,18 @@ const emptyProductForm: ProductFormState = {
   price: '',
 };
 
-function slugify(name: string) {
-  return name
-    .toLowerCase()
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
-function buildProductRows(regions: Region[]): ProductRow[] {
-  return regions.flatMap((region) =>
-    (region.exports || []).map((exp) => ({
-      regionId: region._id,
-      regionName: region.name,
-      regionProvince: region.province,
-      exportId: exp._id,
-      name: exp.name,
-      description: exp.description,
-      category: exp.category,
-      price: exp.price,
-      slug: slugify(exp.name),
-    }))
-  );
-}
-
-export default function AdminDashboard({ initialRegions }: { initialRegions: Region[] }) {
+export default function AdminDashboard({ initialRegions, initialProducts }: { initialRegions: Region[]; initialProducts: ProductRow[] }) {
   const [regions, setRegions] = useState<Region[]>(initialRegions);
+  const [products, setProducts] = useState<ProductRow[]>(initialProducts);
   const [activeTab, setActiveTab] = useState<'regions' | 'products'>('regions');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [regionQuery, setRegionQuery] = useState('');
   const [productQuery, setProductQuery] = useState('');
   const [editingRegionId, setEditingRegionId] = useState<string | null>(null);
-  const [editingProduct, setEditingProduct] = useState<{ regionId: string; exportId: string } | null>(null);
+  const [editingProduct, setEditingProduct] = useState<{ exportId: string } | null>(null);
   const [regionForm, setRegionForm] = useState<RegionFormState>(emptyRegionForm);
   const [productForm, setProductForm] = useState<ProductFormState>(emptyProductForm);
-
-  const products = useMemo(() => buildProductRows(regions), [regions]);
 
   const filteredRegions = useMemo(() => {
     const q = regionQuery.trim().toLowerCase();
@@ -167,8 +135,12 @@ export default function AdminDashboard({ initialRegions }: { initialRegions: Reg
   };
 
   const reloadData = async () => {
-    const data = await requestJson('/api/regions');
-    setRegions(Array.isArray(data) ? data : []);
+    const [regionsData, productsData] = await Promise.all([
+      requestJson('/api/regions'),
+      requestJson('/api/products'),
+    ]);
+    setRegions(Array.isArray(regionsData) ? regionsData : []);
+    setProducts(Array.isArray(productsData) ? productsData : []);
   };
 
   const resetRegionForm = () => {
@@ -230,6 +202,7 @@ export default function AdminDashboard({ initialRegions }: { initialRegions: Reg
 
     try {
       const payload = {
+        regionId: productForm.regionId,
         name: productForm.name,
         description: productForm.description,
         category: productForm.category,
@@ -237,12 +210,12 @@ export default function AdminDashboard({ initialRegions }: { initialRegions: Reg
       };
 
       if (editingProduct) {
-        await requestJson(`/api/admin/regions/${editingProduct.regionId}/exports/${editingProduct.exportId}`, {
+        await requestJson(`/api/admin/products/${editingProduct.exportId}`, {
           method: 'PUT',
           body: JSON.stringify(payload),
         });
       } else {
-        await requestJson(`/api/admin/regions/${productForm.regionId}/exports`, {
+        await requestJson('/api/admin/products', {
           method: 'POST',
           body: JSON.stringify(payload),
         });
@@ -277,9 +250,9 @@ export default function AdminDashboard({ initialRegions }: { initialRegions: Reg
     setLoading(true);
     setError(null);
     try {
-      await requestJson(`/api/admin/regions/${regionId}/exports/${exportId}`, { method: 'DELETE' });
+      await requestJson(`/api/admin/products/${exportId}`, { method: 'DELETE' });
       await reloadData();
-      if (editingProduct?.regionId === regionId && editingProduct.exportId === exportId) resetProductForm();
+      if (editingProduct?.exportId === exportId) resetProductForm();
     } catch (err: any) {
       setError(err?.message || 'Unable to delete product');
     } finally {
@@ -301,7 +274,7 @@ export default function AdminDashboard({ initialRegions }: { initialRegions: Reg
   };
 
   const startEditProduct = (product: ProductRow) => {
-    setEditingProduct({ regionId: product.regionId, exportId: product.exportId });
+    setEditingProduct({ exportId: product.exportId });
     setProductForm({
       regionId: product.regionId,
       name: product.name,
@@ -444,10 +417,10 @@ export default function AdminDashboard({ initialRegions }: { initialRegions: Reg
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {(region.exports || []).map((exp, index) => (
-                      <span key={`${region._id}-export-chip-${index}`} className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700">
+                    {products.filter((product) => product.regionId === region._id).map((product) => (
+                      <span key={product.exportId} className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700">
                         <Package size={14} className="text-emerald-600" />
-                        {exp.name}
+                        {product.name}
                       </span>
                     ))}
                   </div>
@@ -498,7 +471,7 @@ export default function AdminDashboard({ initialRegions }: { initialRegions: Reg
                   ) : (
                     <div className="space-y-2 max-h-56 overflow-auto pr-1">
                       {selectedRegionProducts.map((product) => (
-                        <div key={`${product.regionId}-${product.exportId}`} className="flex items-start justify-between gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3">
+                        <div key={product.exportId} className="flex items-start justify-between gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3">
                           <div>
                             <div className="font-semibold text-stone-900">{product.name}</div>
                             <div className="text-xs text-stone-500 mt-1">{product.category} • Price: {product.price}</div>
@@ -546,7 +519,7 @@ export default function AdminDashboard({ initialRegions }: { initialRegions: Reg
 
             <div className="space-y-4 max-h-[720px] overflow-auto pr-1">
               {filteredProducts.map((product) => (
-                <div key={`${product.regionId}-${product.exportId}`} className="rounded-3xl border border-stone-200 bg-stone-50 p-5">
+                <div key={product.exportId} className="rounded-3xl border border-stone-200 bg-stone-50 p-5">
                   <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2 mb-2 text-stone-500 text-sm">

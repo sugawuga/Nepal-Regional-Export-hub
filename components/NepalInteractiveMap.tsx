@@ -59,6 +59,7 @@ export default function NepalInteractiveMap() {
   const [mounted, setMounted] = useState(false);
   const [geoData, setGeoData] = useState<any>(null);
   const [dbRegions, setDbRegions] = useState<any[]>([]);
+  const [dbProducts, setDbProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [fetchingDetails, setFetchingDetails] = useState(false);
@@ -87,35 +88,7 @@ export default function NepalInteractiveMap() {
 
     setFetchingDetails(true);
     try {
-      // Normalize province name for the API (e.g., "Province 3" -> "bagmati", "Koshi" -> "koshi")
-      let apiProvince = provinceName.toLowerCase().replace('province', '').trim();
-      
-      // Map numeric IDs to names if necessary
-      const idToName: Record<string, string> = {
-        "1": "koshi", "2": "madhesh", "3": "bagmati", "4": "gandaki", 
-        "5": "lumbini", "6": "karnali", "7": "sudurpashchim"
-      };
-      
-      if (idToName[apiProvince]) {
-        apiProvince = idToName[apiProvince];
-      }
-      
-      const formattedProvince = apiProvince.replace(/\s+/g, '-');
-      const addrRes = await fetch(`https://nepaliaddress.up.railway.app/districts/${formattedProvince}`, {
-        signal: AbortSignal.timeout(3000)
-      }).catch(() => null);
-
-      let municipalities: string[] = [];
-      if (addrRes && addrRes.ok) {
-        const addrData = await addrRes.json();
-        // Find the district in the province data
-        const districtData = addrData.find((d: any) => d.name.toLowerCase() === districtName.toLowerCase());
-        if (districtData && districtData.municipalities) {
-          municipalities = districtData.municipalities;
-        }
-      }
-
-      // 2. Fetch Live POIs from Overpass API (Agricultural markets/shops)
+      // Fetch Live POIs from Overpass API (Agricultural markets/shops)
       const overpassQuery = `
         [out:json][timeout:25];
         area["name"="${districtName}"]->.searchArea;
@@ -143,7 +116,6 @@ export default function NepalInteractiveMap() {
         if (!prev || prev.name !== districtName) return prev;
         return {
           ...prev,
-          municipalities: municipalities.length > 0 ? municipalities : undefined,
           livePois: pois.length > 0 ? pois : undefined
         };
       });
@@ -184,11 +156,21 @@ export default function NepalInteractiveMap() {
         
         // After loading map data, fetch DB regions
         try {
-          const { data: regions, error: regionsError } = await eden.api.regions.get();
+          const [{ data: regions, error: regionsError }, { data: products, error: productsError }] = await Promise.all([
+            eden.api.regions.get(),
+            eden.api.products.get(),
+          ]);
+
           if (regionsError) {
             console.error("API Error fetching regions:", regionsError);
           } else if (regions) {
             setDbRegions(regions);
+          }
+
+          if (productsError) {
+            console.error("API Error fetching products:", productsError);
+          } else if (products) {
+            setDbProducts(products);
           }
         } catch (dbErr) {
           console.error("Network error fetching DB regions. This usually happens if the API is unreachable:", dbErr);
@@ -276,6 +258,7 @@ export default function NepalInteractiveMap() {
 
                       // Prefer database regions as the source of truth when available
                       const dbRegion = dbRegions.find(r => r.name.toLowerCase() === districtName.toLowerCase());
+                      const dbRegionProducts = dbProducts.filter((product) => String(product.regionId) === String(dbRegion?._id));
 
                       // Fallback to static data when DB is missing a region
                       const staticInfo = DISTRICT_DATA[districtName] || PROVINCE_FALLBACK[provinceId] || PROVINCE_FALLBACK[districtName];
@@ -285,7 +268,7 @@ export default function NepalInteractiveMap() {
                       const info = dbRegion ? {
                         name: dbRegion.name,
                         province: dbRegion.province || finalProvinceName,
-                        exports: dbRegion.exports.map((e: any) => e.name),
+                        exports: dbRegionProducts.map((e: any) => e.name),
                         description: dbRegion.description,
                       } : staticInfo;
 
@@ -340,7 +323,7 @@ export default function NepalInteractiveMap() {
                       scheduleHoverUpdate(region.name, {
                         name: region.name,
                         province: region.is_verified ? (region.province || "Verified Hub") : (region.province || "Unverified"),
-                        exports: region.exports.map((e: any) => e.name),
+                          exports: dbProducts.filter((product) => String(product.regionId) === String(region._id)).map((e: any) => e.name),
                         description: region.description
                       });
                     }}

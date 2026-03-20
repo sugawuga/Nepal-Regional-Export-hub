@@ -7,10 +7,30 @@ export type RegionSeed = {
   is_verified: boolean;
   coordinates?: [number, number];
   location: { type: 'Point'; coordinates: [number, number] };
-  exports: { name: string; description: string; category: string; price: number }[];
+};
+
+export type ProductSeed = {
+  name: string;
+  slug: string;
+};
+
+export type RegionProductSeed = {
+  regionName: string;
+  productName: string;
+  description: string;
+  category: string;
+  price: number;
 };
 
 const DEFAULT_COORDINATES: [number, number] = [84.1240, 28.3949];
+
+function slugify(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 // Basic heuristics for category + pricing from a plain export name
 function normalizeExport(name: string) {
@@ -48,7 +68,6 @@ export function getSeedRegions(): RegionSeed[] {
   return DISTRICT_SEEDS.map((info) => {
     const name = info.name;
     const coords = info.coordinates || DEFAULT_COORDINATES;
-    const exportsList = (info.exports || []).map(normalizeExport);
 
     return {
       name,
@@ -57,7 +76,37 @@ export function getSeedRegions(): RegionSeed[] {
       is_verified: false,
       coordinates: coords,
       location: { type: 'Point', coordinates: coords },
-      exports: exportsList,
     };
   });
+}
+
+export function getSeedProducts(): ProductSeed[] {
+  const seen = new Set<string>();
+  for (const info of DISTRICT_SEEDS) {
+    for (const exportName of info.exports || []) {
+      seen.add(normalizeExport(exportName).name.toLowerCase());
+    }
+  }
+
+  return Array.from(seen)
+    .sort()
+    .map((name) => ({
+      name,
+      slug: slugify(name),
+    }));
+}
+
+export function getSeedRegionProducts(): RegionProductSeed[] {
+  return DISTRICT_SEEDS.flatMap((info) =>
+    (info.exports || []).map((exportName) => {
+      const normalized = normalizeExport(exportName);
+      return {
+        regionName: info.name,
+        productName: normalized.name,
+        description: `High-quality ${normalized.name} sourced from ${info.name}.`,
+        category: normalized.category,
+        price: normalized.price,
+      };
+    })
+  );
 }

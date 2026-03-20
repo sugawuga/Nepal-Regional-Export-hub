@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowLeft, MapPin, Package, Tag } from 'lucide-react';
-import { connectDB, Region as RegionModel } from '@/lib/db';
+import { connectDB, Product as ProductModel, Region as RegionModel, RegionProduct as RegionProductModel } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,42 +27,42 @@ function slugifyExportName(name: string) {
 export default async function ExportsPage() {
   await connectDB();
 
-  const regions = await RegionModel.find().lean();
+  const [regions, products, links] = await Promise.all([
+    RegionModel.find().lean(),
+    ProductModel.find().lean(),
+    RegionProductModel.find().lean(),
+  ]);
+
+  const regionMap = new Map((regions as any[]).map((region) => [String(region._id), region]));
+  const productMap = new Map((products as any[]).map((product) => [String(product._id), product]));
   const commodityMap = new Map<string, CommodityGroup>();
 
-  for (const region of regions as any[]) {
-    const exportNames = Array.isArray(region.exports)
-      ? region.exports.map((item: any) => item?.name).filter(Boolean)
-      : [];
+  for (const link of links as any[]) {
+    const region = regionMap.get(String(link.regionId));
+    const product = productMap.get(String(link.productId));
+    if (!region || !product) continue;
 
-    for (const exportName of exportNames) {
-      const key = String(exportName).trim().toLowerCase();
-      if (!key) continue;
+    const key = String(product.name || '').trim().toLowerCase();
+    if (!key) continue;
 
-      const displayName = String(exportName).trim();
-      if (!commodityMap.has(key)) {
-        commodityMap.set(key, {
-          name: displayName,
-          slug: slugifyExportName(displayName),
-          regions: [],
-        });
-      }
+    if (!commodityMap.has(key)) {
+      commodityMap.set(key, {
+        name: String(product.name || '').trim(),
+        slug: slugifyExportName(String(product.name || '').trim()),
+        regions: [],
+      });
+    }
 
-      const current = commodityMap.get(key)!;
-      const regionName = String(region.name || '').trim();
-      if (!regionName) continue;
+    const current = commodityMap.get(key)!;
+    const regionName = String(region.name || '').trim();
+    if (!regionName) continue;
 
-      if (!current.regions.some((entry) => entry.name.toLowerCase() === regionName.toLowerCase())) {
-        current.regions.push({
-          name: regionName,
-          province: String(region.province || 'Nepal'),
-          slug: regionName
-            .toLowerCase()
-            .replace(/&/g, 'and')
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, ''),
-        });
-      }
+    if (!current.regions.some((entry) => entry.name.toLowerCase() === regionName.toLowerCase())) {
+      current.regions.push({
+        name: regionName,
+        province: String(region.province || 'Nepal'),
+        slug: regionName.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
+      });
     }
   }
 
@@ -70,7 +70,7 @@ export default async function ExportsPage() {
     (a, b) => b.regions.length - a.regions.length || a.name.localeCompare(b.name)
   );
 
-  const totalRegions = new Set((regions as any[]).map((region) => String(region.name).toLowerCase())).size;
+  const totalRegions = new Set((links as any[]).map((link) => String(link.regionId))).size;
   const totalCommodities = commodityGroups.length;
   const topCommodity = commodityGroups[0];
 

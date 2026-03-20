@@ -27,14 +27,6 @@ export async function connectDB() {
   return cached.conn;
 }
 
-// Schemas
-const exportItemSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  category: { type: String, required: true },
-  price: { type: Number, required: true },
-});
-
 const regionSchema = new mongoose.Schema({
   name: { type: String, required: true },
   province: { type: String, required: true },
@@ -44,11 +36,25 @@ const regionSchema = new mongoose.Schema({
     type: { type: String, enum: ['Point'], required: true },
     coordinates: { type: [Number], required: true }, // [longitude, latitude]
   },
-  exports: [exportItemSchema],
+});
+
+const productSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  slug: { type: String, required: true, index: true },
+});
+
+const regionProductSchema = new mongoose.Schema({
+  regionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Region', required: true, index: true },
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true, index: true },
+  description: { type: String, required: true },
+  category: { type: String, required: true },
+  price: { type: Number, required: true },
 });
 
 // 2dsphere indexing for geospatial queries
 regionSchema.index({ location: '2dsphere' });
+regionProductSchema.index({ regionId: 1, productId: 1 }, { unique: true });
 
 export const Region = mongoose.models.Region || mongoose.model('Region', regionSchema);
-export const ExportItem = mongoose.models.ExportItem || mongoose.model('ExportItem', exportItemSchema);
+export const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
+export const RegionProduct = mongoose.models.RegionProduct || mongoose.model('RegionProduct', regionProductSchema);
