@@ -1,14 +1,15 @@
-import { connectDB, Product as ProductModel, Region as RegionModel, RegionProduct as RegionProductModel } from '@/lib/db';
+import { connectDB, Inquiry as InquiryModel, Product as ProductModel, Region as RegionModel, RegionProduct as RegionProductModel } from '@/lib/db';
 import AdminDashboard from '@/components/AdminDashboard';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
   await connectDB();
-  const [regions, products, links] = await Promise.all([
+  const [regions, products, links, inquiries] = await Promise.all([
     RegionModel.find().lean(),
     ProductModel.find().lean(),
     RegionProductModel.find().lean(),
+    InquiryModel.find().sort({ createdAt: -1 }).lean(),
   ]);
 
   const regionMap = new Map((regions as any[]).map((region) => [String(region._id), region]));
@@ -35,6 +36,7 @@ export default async function AdminPage() {
     <AdminDashboard
       initialRegions={JSON.parse(JSON.stringify(regions))}
       initialProducts={JSON.parse(JSON.stringify(enrichedProducts))}
+      initialInquiries={JSON.parse(JSON.stringify(inquiries))}
     />
   );
 }

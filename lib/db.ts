@@ -51,6 +51,24 @@ const regionProductSchema = new mongoose.Schema({
   price: { type: Number, required: true },
 });
 
+const inquirySchema = new mongoose.Schema(
+  {
+    regionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Region', index: true, default: null },
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', index: true, default: null },
+    regionName: { type: String, required: true },
+    regionProvince: { type: String, required: true },
+    productName: { type: String, default: '' },
+    fullName: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, default: '' },
+    company: { type: String, default: '' },
+    quantity: { type: String, default: '' },
+    message: { type: String, required: true },
+    status: { type: String, default: 'new' },
+  },
+  { timestamps: true }
+);
+
 // 2dsphere indexing for geospatial queries
 regionSchema.index({ location: '2dsphere' });
 regionProductSchema.index({ regionId: 1, productId: 1 }, { unique: true });
@@ -58,3 +76,4 @@ regionProductSchema.index({ regionId: 1, productId: 1 }, { unique: true });
 export const Region = mongoose.models.Region || mongoose.model('Region', regionSchema);
 export const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 export const RegionProduct = mongoose.models.RegionProduct || mongoose.model('RegionProduct', regionProductSchema);
+export const Inquiry = mongoose.models.Inquiry || mongoose.model('Inquiry', inquirySchema);

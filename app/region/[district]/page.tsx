@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft, MapPin, Package, Tag, Info, Globe, ShieldCheck } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { DISTRICT_DATA, slugifyDistrictName } from '@/lib/districts';
+import InquiryForm from '@/components/InquiryForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,12 +12,14 @@ interface PageProps {
 }
 
 interface Region {
+  _id?: string;
   name: string;
   province: string;
   description: string;
   location: { coordinates: number[] };
   products: {
     _id?: string;
+    slug?: string;
     name: string;
     description: string;
     category: string;
@@ -49,6 +52,7 @@ export default async function RegionPage({ params }: PageProps) {
 
   // Normalize data
   const region: Region = dbRegion ? {
+    _id: String((dbRegion as any)._id),
     name: (dbRegion as any).name,
     province: (dbRegion as any).province,
     description: (dbRegion as any).description,
@@ -57,6 +61,11 @@ export default async function RegionPage({ params }: PageProps) {
       const product = (products as any[]).find((entry) => String(entry._id) === String(link.productId));
       return {
         _id: String(link._id),
+        slug: String(product?.slug || product?.name || '')
+          .toLowerCase()
+          .replace(/&/g, 'and')
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, ''),
         name: product?.name || 'Unknown Product',
         description: link.description,
         category: link.category,
@@ -69,6 +78,7 @@ export default async function RegionPage({ params }: PageProps) {
     description: fallbackData.description,
     location: { coordinates: [84.1240, 28.3949] }, // Default center of Nepal
     products: fallbackData.exports.map(e => ({
+      slug: e.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
       name: e,
       description: "Regional specialty with high export potential.",
       category: "Local Specialty",
@@ -150,7 +160,11 @@ export default async function RegionPage({ params }: PageProps) {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {region.products.map((item: any, idx: number) => (
-              <div key={item._id || idx} className="group bg-white p-8 rounded-[2.5rem] border border-stone-200 hover:border-emerald-300 transition-all shadow-sm hover:shadow-xl hover:shadow-emerald-900/5">
+              <Link
+                key={item._id || idx}
+                href={item.slug ? `/exports/${item.slug}` : '/exports'}
+                className="group block bg-white p-8 rounded-[2.5rem] border border-stone-200 hover:border-emerald-300 transition-all shadow-sm hover:shadow-xl hover:shadow-emerald-900/5"
+              >
                 <div className="w-12 h-12 rounded-2xl bg-stone-50 flex items-center justify-center mb-6 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors text-stone-400">
                   <Package size={24} />
                 </div>
@@ -172,7 +186,7 @@ export default async function RegionPage({ params }: PageProps) {
                     {typeof item.price === 'number' ? `$${item.price}` : item.price}<span className="text-sm text-stone-400 font-normal">/unit</span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </section>
@@ -202,10 +216,19 @@ export default async function RegionPage({ params }: PageProps) {
             <p className="text-emerald-100 leading-relaxed text-lg mb-8">
               We facilitate direct connections with verified producers in {region.name}. Our platform ensures transparency, fair pricing, and quality assurance from the source to the global market.
             </p>
-            <button className="px-8 py-4 bg-white text-emerald-800 rounded-2xl font-bold hover:bg-emerald-50 transition-colors">
+            <a href="#inquiry-form" className="inline-flex px-8 py-4 bg-white text-emerald-800 rounded-2xl font-bold hover:bg-emerald-50 transition-colors">
               Inquire About Supply
-            </button>
+            </a>
           </div>
+        </div>
+
+        <div className="mt-20">
+          <InquiryForm
+            regionId={region._id}
+            regionName={region.name}
+            regionProvince={region.province}
+            products={region.products.map((item) => ({ _id: item._id, slug: item.slug, name: item.name }))}
+          />
         </div>
       </main>
     </div>

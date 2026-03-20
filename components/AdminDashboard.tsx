@@ -38,6 +38,23 @@ type ProductRow = {
   slug: string;
 };
 
+type InquiryRow = {
+  _id: string;
+  regionId?: string | null;
+  productId?: string | null;
+  regionName: string;
+  regionProvince: string;
+  productName?: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  quantity?: string;
+  message: string;
+  status?: string;
+  createdAt?: string;
+};
+
 type RegionFormState = {
   name: string;
   province: string;
@@ -70,14 +87,16 @@ const emptyProductForm: ProductFormState = {
   price: '',
 };
 
-export default function AdminDashboard({ initialRegions, initialProducts }: { initialRegions: Region[]; initialProducts: ProductRow[] }) {
+export default function AdminDashboard({ initialRegions, initialProducts, initialInquiries }: { initialRegions: Region[]; initialProducts: ProductRow[]; initialInquiries: InquiryRow[] }) {
   const [regions, setRegions] = useState<Region[]>(initialRegions);
   const [products, setProducts] = useState<ProductRow[]>(initialProducts);
-  const [activeTab, setActiveTab] = useState<'regions' | 'products'>('regions');
+  const [inquiries, setInquiries] = useState<InquiryRow[]>(initialInquiries);
+  const [activeTab, setActiveTab] = useState<'regions' | 'products' | 'inquiries'>('regions');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [regionQuery, setRegionQuery] = useState('');
   const [productQuery, setProductQuery] = useState('');
+  const [inquiryQuery, setInquiryQuery] = useState('');
   const [editingRegionId, setEditingRegionId] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<{ exportId: string } | null>(null);
   const [regionForm, setRegionForm] = useState<RegionFormState>(emptyRegionForm);
@@ -111,8 +130,9 @@ export default function AdminDashboard({ initialRegions, initialProducts }: { in
       regions: regions.length,
       verified,
       products: products.length,
+      inquiries: inquiries.length,
     };
-  }, [regions, products.length]);
+  }, [regions, products.length, inquiries.length]);
 
   const requestJson = async (input: RequestInfo | URL, init?: RequestInit) => {
     const res = await fetch(input, {
@@ -135,12 +155,14 @@ export default function AdminDashboard({ initialRegions, initialProducts }: { in
   };
 
   const reloadData = async () => {
-    const [regionsData, productsData] = await Promise.all([
+    const [regionsData, productsData, inquiriesData] = await Promise.all([
       requestJson('/api/regions'),
       requestJson('/api/products'),
+      requestJson('/api/admin/inquiries'),
     ]);
     setRegions(Array.isArray(regionsData) ? regionsData : []);
     setProducts(Array.isArray(productsData) ? productsData : []);
+    setInquiries(Array.isArray(inquiriesData) ? inquiriesData : []);
   };
 
   const resetRegionForm = () => {
@@ -260,6 +282,25 @@ export default function AdminDashboard({ initialRegions, initialProducts }: { in
     }
   };
 
+  const filteredInquiries = useMemo(() => {
+    const q = inquiryQuery.trim().toLowerCase();
+    if (!q) return inquiries;
+    return inquiries.filter((inquiry) =>
+      [
+        inquiry.fullName,
+        inquiry.email,
+        inquiry.phone,
+        inquiry.company,
+        inquiry.quantity,
+        inquiry.message,
+        inquiry.regionName,
+        inquiry.regionProvince,
+        inquiry.productName,
+        inquiry.status,
+      ].some((value) => value?.toLowerCase().includes(q))
+    );
+  }, [inquiries, inquiryQuery]);
+
   const startEditRegion = (region: Region) => {
     setEditingRegionId(region._id);
     const coords = region.location?.coordinates || [84.1240, 28.3949];
@@ -299,7 +340,7 @@ export default function AdminDashboard({ initialRegions, initialProducts }: { in
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
           <div className="bg-white rounded-3xl border border-stone-200 p-5 shadow-sm">
             <div className="text-sm text-stone-500 mb-1">Regions</div>
             <div className="text-3xl font-bold text-stone-900">{summary.regions}</div>
@@ -311,6 +352,10 @@ export default function AdminDashboard({ initialRegions, initialProducts }: { in
           <div className="bg-white rounded-3xl border border-stone-200 p-5 shadow-sm">
             <div className="text-sm text-stone-500 mb-1">Verified Regions</div>
             <div className="text-3xl font-bold text-stone-900">{summary.verified}</div>
+          </div>
+          <div className="bg-white rounded-3xl border border-stone-200 p-5 shadow-sm">
+            <div className="text-sm text-stone-500 mb-1">Inquiries</div>
+            <div className="text-3xl font-bold text-stone-900">{summary.inquiries}</div>
           </div>
         </div>
 
@@ -327,11 +372,11 @@ export default function AdminDashboard({ initialRegions, initialProducts }: { in
           >
             Regions
           </button>
-          <button
-            onClick={() => setActiveTab('products')}
-            className={`px-5 py-3 rounded-full font-semibold transition-colors ${activeTab === 'products' ? 'bg-stone-900 text-white' : 'bg-white border border-stone-200 text-stone-600'}`}
-          >
+          <button onClick={() => setActiveTab('products')} className={`px-5 py-3 rounded-full font-semibold transition-colors ${activeTab === 'products' ? 'bg-stone-900 text-white' : 'bg-white border border-stone-200 text-stone-600'}`}>
             Products
+          </button>
+          <button onClick={() => setActiveTab('inquiries')} className={`px-5 py-3 rounded-full font-semibold transition-colors ${activeTab === 'inquiries' ? 'bg-stone-900 text-white' : 'bg-white border border-stone-200 text-stone-600'}`}>
+            Inquiries
           </button>
           <button
             onClick={reloadData}
@@ -344,8 +389,49 @@ export default function AdminDashboard({ initialRegions, initialProducts }: { in
         </div>
       </section>
 
-      <section className="px-6 pb-20 max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-8">
-        <div className={`space-y-8 ${activeTab === 'regions' ? '' : 'hidden'} xl:block`}>
+      <section className="px-6 pb-20 max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-[260px_minmax(0,1fr)] gap-8 items-start">
+        <aside className="hidden xl:block sticky top-28 self-start">
+          <div className="bg-white rounded-[2rem] border border-stone-200 shadow-sm p-4">
+            <div className="px-4 py-3 mb-3 rounded-2xl bg-stone-50 border border-stone-200">
+              <div className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-1">Admin Menu</div>
+              <div className="text-sm text-stone-700">Manage content</div>
+            </div>
+            <div className="space-y-2">
+              <button
+                onClick={() => setActiveTab('regions')}
+                className={`w-full flex items-center justify-between rounded-2xl px-4 py-3 text-left font-semibold transition-colors ${activeTab === 'regions' ? 'bg-stone-900 text-white' : 'bg-white border border-stone-200 text-stone-700 hover:border-emerald-300 hover:text-emerald-700'}`}
+              >
+                <span>Regions</span>
+                <span className="text-xs opacity-70">{regions.length}</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('products')}
+                className={`w-full flex items-center justify-between rounded-2xl px-4 py-3 text-left font-semibold transition-colors ${activeTab === 'products' ? 'bg-stone-900 text-white' : 'bg-white border border-stone-200 text-stone-700 hover:border-emerald-300 hover:text-emerald-700'}`}
+              >
+                <span>Products</span>
+                <span className="text-xs opacity-70">{products.length}</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('inquiries')}
+                className={`w-full flex items-center justify-between rounded-2xl px-4 py-3 text-left font-semibold transition-colors ${activeTab === 'inquiries' ? 'bg-stone-900 text-white' : 'bg-white border border-stone-200 text-stone-700 hover:border-emerald-300 hover:text-emerald-700'}`}
+              >
+                <span>Inquiries</span>
+                <span className="text-xs opacity-70">{inquiries.length}</span>
+              </button>
+            </div>
+            <button
+              onClick={reloadData}
+              disabled={loading}
+              className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-3 text-white font-semibold hover:bg-emerald-500 transition-colors disabled:opacity-50"
+            >
+              {loading ? <Loader2 className="animate-spin" size={16} /> : <RefreshCw size={16} />}
+              Refresh
+            </button>
+          </div>
+        </aside>
+
+        <div className="space-y-8">
+          <div className={`space-y-8 ${activeTab === 'regions' ? '' : 'hidden'}`}>
           <div className="bg-white rounded-[2rem] border border-stone-200 shadow-sm p-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <div>
@@ -429,9 +515,9 @@ export default function AdminDashboard({ initialRegions, initialProducts }: { in
               {filteredRegions.length === 0 && <div className="text-center text-stone-500 py-12">No regions found.</div>}
             </div>
           </div>
-        </div>
+          </div>
 
-        <div className={`space-y-8 ${activeTab === 'products' ? '' : 'hidden'} xl:block`}>
+          <div className={`space-y-8 ${activeTab === 'products' ? '' : 'hidden'}`}>
           <div className="bg-white rounded-[2rem] border border-stone-200 shadow-sm p-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <div>
@@ -554,6 +640,77 @@ export default function AdminDashboard({ initialRegions, initialProducts }: { in
               ))}
               {filteredProducts.length === 0 && <div className="text-center text-stone-500 py-12">No products found.</div>}
             </div>
+          </div>
+          </div>
+
+          <div className={`space-y-8 ${activeTab === 'inquiries' ? '' : 'hidden'}`}>
+          <div className="bg-white rounded-[2rem] border border-stone-200 shadow-sm p-8">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-stone-900">Inquiries</h2>
+                <p className="text-stone-500 mt-1">View submitted supply requests from the district pages.</p>
+              </div>
+              <div className="relative w-full lg:max-w-xs">
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
+                <input value={inquiryQuery} onChange={(e) => setInquiryQuery(e.target.value)} placeholder="Search inquiries" className="w-full rounded-full border border-stone-200 bg-stone-50 pl-10 pr-4 py-3 outline-none focus:border-emerald-400" />
+              </div>
+            </div>
+
+            <div className="space-y-4 max-h-[760px] overflow-auto pr-1">
+              {filteredInquiries.map((inquiry) => (
+                <div key={inquiry._id} className="rounded-3xl border border-stone-200 bg-stone-50 p-5">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2 mb-2 text-stone-500 text-sm">
+                        <MapPin size={14} />
+                        <span>{inquiry.regionName}</span>
+                        <span className="text-stone-300">•</span>
+                        <span>{inquiry.regionProvince}</span>
+                        {inquiry.status && <span className="rounded-full bg-white border border-stone-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">{inquiry.status}</span>}
+                      </div>
+                      <h3 className="text-xl font-bold text-stone-900">{inquiry.fullName}</h3>
+                      <p className="text-stone-500 mt-2 leading-relaxed">{inquiry.message}</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+                      <a href={`mailto:${inquiry.email}`} className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-semibold text-stone-700 hover:border-emerald-300 hover:text-emerald-700">
+                        Reply
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-stone-600">
+                    <div className="rounded-2xl border border-stone-200 bg-white px-4 py-3">
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-1">Email</div>
+                      <div className="font-medium break-all">{inquiry.email}</div>
+                    </div>
+                    <div className="rounded-2xl border border-stone-200 bg-white px-4 py-3">
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-1">Product</div>
+                      <div className="font-medium">{inquiry.productName || 'General inquiry'}</div>
+                    </div>
+                    {inquiry.phone && (
+                      <div className="rounded-2xl border border-stone-200 bg-white px-4 py-3">
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-1">Phone</div>
+                        <div className="font-medium">{inquiry.phone}</div>
+                      </div>
+                    )}
+                    {inquiry.company && (
+                      <div className="rounded-2xl border border-stone-200 bg-white px-4 py-3">
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-1">Company</div>
+                        <div className="font-medium">{inquiry.company}</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {inquiry.quantity && (
+                    <div className="mt-3 text-sm text-stone-500">
+                      Quantity: <span className="font-medium text-stone-700">{inquiry.quantity}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+              {filteredInquiries.length === 0 && <div className="text-center text-stone-500 py-12">No inquiries found.</div>}
+            </div>
+          </div>
           </div>
         </div>
       </section>

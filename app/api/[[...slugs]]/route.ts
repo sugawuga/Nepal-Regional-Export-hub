@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia';
 import mongoose from 'mongoose';
-import { connectDB, Product, Region, RegionProduct } from '@/lib/db';
+import { connectDB, Inquiry, Product, Region, RegionProduct } from '@/lib/db';
 import { getSeedProducts, getSeedRegionProducts, getSeedRegions } from '@/lib/seed-data';
 
 const slugify = (name: string) =>
@@ -44,6 +44,20 @@ const createProductPayload = (input: any) => ({
   description: String(input?.description || '').trim(),
   category: String(input?.category || 'Local Specialty').trim(),
   price: Number(input?.price ?? 0),
+});
+
+const createInquiryPayload = (input: any) => ({
+  regionId: input?.regionId && mongoose.Types.ObjectId.isValid(input.regionId) ? input.regionId : null,
+  productId: input?.productId && mongoose.Types.ObjectId.isValid(input.productId) ? input.productId : null,
+  regionName: String(input?.regionName || '').trim(),
+  regionProvince: String(input?.regionProvince || '').trim(),
+  productName: String(input?.productName || '').trim(),
+  fullName: String(input?.fullName || '').trim(),
+  email: String(input?.email || '').trim(),
+  phone: String(input?.phone || '').trim(),
+  company: String(input?.company || '').trim(),
+  quantity: String(input?.quantity || '').trim(),
+  message: String(input?.message || '').trim(),
 });
 
 const ensureBaseProduct = async (payload: { productId?: string; name: string; slug: string }) => {
@@ -116,6 +130,9 @@ const app = new Elysia({ prefix: '/api' })
   })
   .get('/admin/products', async () => {
     return await listProductsWithRegions();
+  })
+  .get('/admin/inquiries', async () => {
+    return await Inquiry.find().sort({ createdAt: -1 }).lean();
   })
   .post('/admin/regions', async ({ body }) => {
     const payload = createRegionPayload(body);
@@ -218,6 +235,28 @@ const app = new Elysia({ prefix: '/api' })
     });
 
     return serializeProduct(created.toObject(), regionDoc, baseProduct);
+  })
+  .post('/inquiries', async ({ body, set }) => {
+    const rawBody = typeof body === 'string' ? JSON.parse(body) : body;
+    const payload = createInquiryPayload(rawBody);
+
+    if (!payload.regionName || !payload.regionProvince || !payload.fullName || !payload.email || !payload.message) {
+      set.status = 400;
+      return { error: 'regionName, regionProvince, fullName, email, and message are required' };
+    }
+
+    if (payload.regionId && !mongoose.Types.ObjectId.isValid(payload.regionId)) {
+      set.status = 400;
+      return { error: 'Invalid regionId' };
+    }
+
+    if (payload.productId && !mongoose.Types.ObjectId.isValid(payload.productId)) {
+      set.status = 400;
+      return { error: 'Invalid productId' };
+    }
+
+    const created = await Inquiry.create(payload);
+    return created.toObject();
   })
   .put('/admin/products/:id', async ({ params: { id }, body, set }) => {
     const payload = createProductPayload(body);
