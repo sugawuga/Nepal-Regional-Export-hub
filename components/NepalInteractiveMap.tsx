@@ -198,21 +198,15 @@ export default function NepalInteractiveMap() {
           <h2 className="text-4xl font-bold text-stone-900 tracking-tight">Interactive Export Map</h2>
           <p className="text-stone-500 mt-2 text-lg">Detailed district-level view of Nepal&apos;s export economy.</p>
         </div>
-        <div className="flex gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-            <span className="text-sm text-stone-600 font-medium">High Volume</span>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-[#F27D26]"></div>
+          <span className="text-sm text-stone-600 font-medium">Active Export Hub</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-emerald-200"></div>
-            <span className="text-sm text-stone-600 font-medium">Emerging</span>
-          </div>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         {/* Map Container */}
-        <div className="lg:col-span-8 bg-white rounded-[3rem] p-4 sm:p-8 border border-stone-200 shadow-2xl shadow-stone-200/50 relative overflow-hidden min-h-[600px] flex items-center justify-center">
+        <div className="lg:col-span-7 bg-white rounded-[3rem] p-4 sm:p-8 border border-stone-200 shadow-2xl shadow-stone-200/50 relative overflow-hidden min-h-[600px] flex items-center justify-center">
           {loading ? (
             <div className="flex flex-col items-center gap-4">
               <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
@@ -377,7 +371,7 @@ export default function NepalInteractiveMap() {
         </div>
 
         {/* Info Panel */}
-        <div className="lg:col-span-4">
+        <div className="lg:col-span-5">
           <AnimatePresence mode="wait">
             <motion.div
               key={displayInfo.name}
