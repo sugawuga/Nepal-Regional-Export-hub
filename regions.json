@@ -30,7 +30,7 @@
     "description": "Heritage city famous for pottery, yogurt, and traditional artisanship."
   },
   {
-    "name": "Kavrepalanchok",
+    "name": "KAVRE",
     "province": "Bagmati",
     "exports": [
       "Tea",
@@ -220,7 +220,7 @@
     "description": "Known for citrus orchards, coffee, and mid-hill agricultural trade."
   },
   {
-    "name": "Tanahun",
+    "name": "TANAHU",
     "province": "Gandaki",
     "exports": [
       "Dairy",
@@ -330,7 +330,7 @@
     "description": "Remote mountain district with cardamom and eco-tourism potential."
   },
   {
-    "name": "Terhathum",
+    "name": "TEHRATHUM",
     "province": "Koshi",
     "exports": [
       "Tea",
@@ -370,7 +370,7 @@
     "description": "Tea-growing hill district with spices and dairy products."
   },
   {
-    "name": "Dhanusha",
+    "name": "DHANUSA",
     "province": "Madhesh",
     "exports": [
       "Rice",
@@ -460,7 +460,7 @@
     "description": "Industrial powerhouse and home to Lumbini, the birthplace of Buddha."
   },
   {
-    "name": "Kapilvastu",
+    "name": "KAPILBASTU",
     "province": "Lumbini",
     "exports": [
       "Rice",
@@ -470,24 +470,17 @@
     "description": "Historic Tarai district with agriculture and Buddhist heritage tourism."
   },
   {
-    "name": "Nawalparasi East",
+    "name": "Nawalparasi",
     "province": "Lumbini",
     "exports": [
       "Dairy",
       "Vegetables",
-      "Tourism"
-    ],
-    "description": "Eastern Nawalparasi district with agriculture and lakeside tourism."
-  },
-  {
-    "name": "Nawalparasi West",
-    "province": "Lumbini",
-    "exports": [
+      "Tourism",
       "Sugar",
       "Rice",
       "Trade Services"
     ],
-    "description": "Western Nawalparasi district with trade, sugar, and market agriculture."
+    "description": "Combined Nawalparasi district with agriculture, trade, and lakeside tourism."
   },
   {
     "name": "Dang",
@@ -570,14 +563,15 @@
     "description": "Remote hill district with herbs, honey, and rural agriculture."
   },
   {
-    "name": "Rukum East",
-    "province": "Lumbini",
+    "name": "Rukum",
+    "province": "Karnali",
     "exports": [
       "Herbs",
       "Agriculture",
-      "Tourism"
+      "Tourism",
+      "Handicrafts"
     ],
-    "description": "Eastern Rukum district with mountain agriculture and eco-tourism."
+    "description": "Combined Rukum district with mountain agriculture, tourism, and small-scale handicrafts."
   },
   {
     "name": "Surkhet",
@@ -618,16 +612,6 @@
       "Livestock"
     ],
     "description": "Hill district with ginger production and mixed farming."
-  },
-  {
-    "name": "Rukum West",
-    "province": "Karnali",
-    "exports": [
-      "Herbs",
-      "Agriculture",
-      "Handicrafts"
-    ],
-    "description": "Western Rukum district with herbs and small-scale rural production."
   },
   {
     "name": "Jumla",
